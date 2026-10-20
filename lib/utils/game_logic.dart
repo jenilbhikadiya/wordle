@@ -88,8 +88,9 @@ int dailyNumber(DateTime date) {
   return day.difference(launch).inDays + 1;
 }
 
-/// The word for a calendar date. The daily list is already shuffled and has
-/// no repeats, so each day gets a unique word until the list runs out.
+/// The word for a calendar date, from the daily schedule in day order.
+/// Every player gets the same word on the same date. Once the last day of the
+/// schedule has passed, it loops back to day 1.
 String dailyWord(List<String> words, DateTime date) {
   final index = (dailyNumber(date) - 1) % words.length;
   return words[index < 0 ? index + words.length : index];

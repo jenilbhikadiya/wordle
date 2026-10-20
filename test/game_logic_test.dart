@@ -40,27 +40,41 @@ void main() {
 
   group('daily puzzles', () {
     final launch = DateTime(2026, 10, 20);
-    final words = List.generate(1500, (i) => 'w$i');
+    final words = List.generate(2000, (i) => 'w$i');
 
     test('the launch day is puzzle #1 and each day gets a new word', () {
       expect(dailyNumber(launch), 1);
       expect(dailyWord(words, launch), 'w0');
       expect(dailyWord(words, DateTime(2026, 10, 21, 23, 59)), 'w1');
       final seen = {
-        for (int i = 0; i < 1500; i++)
+        for (int i = 0; i < 2000; i++)
           dailyWord(words, DateTime(2026, 10, 20 + i)),
       };
-      expect(seen.length, 1500);
+      expect(seen.length, 2000);
     });
 
-    test('the daily word list has 1500 unique 4-6 letter words', () {
-      final list = (json.decode(
+    test('the schedule loops back to day 1 after the last day', () {
+      final last = DateTime(2026, 10, 20 + 1999);
+      expect(dailyWord(words, last), 'w1999');
+      expect(dailyWord(words, DateTime(2026, 10, 20 + 2000)), 'w0');
+      expect(dailyWord(words, DateTime(2026, 10, 20 + 2001)), 'w1');
+    });
+
+    test('the daily schedule dates 2000 unique 4-6 letter words', () {
+      final entries = (json.decode(
               File('assets/daily_words.json').readAsStringSync()) as List)
-          .cast<String>();
-      expect(list.length, 1500);
-      expect(list.toSet().length, 1500);
-      expect(list.every((w) => RegExp(r'^[a-z]{4,6}$').hasMatch(w)), isTrue);
-      expect(list.map((w) => w.length).toSet(), {4, 5, 6});
+          .cast<Map<String, dynamic>>();
+      expect(entries.length, 2000);
+      final words = entries.map((e) => e['word'] as String).toList();
+      expect(words.toSet().length, 2000);
+      expect(words.every((w) => RegExp(r'^[a-z]{4,6}$').hasMatch(w)), isTrue);
+      expect(words.map((w) => w.length).toSet(), {4, 5, 6});
+      for (int i = 0; i < entries.length; i++) {
+        final date = DateTime.parse(entries[i]['date']);
+        expect(entries[i]['day'], i + 1);
+        expect(dailyNumber(date), i + 1, reason: entries[i]['date']);
+        expect(dailyWord(words, date), words[i]);
+      }
     });
 
     test('future days stay locked', () {
