@@ -3,8 +3,8 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:flutter_wordle/utils/game_logic.dart';
-import 'package:flutter_wordle/utils/stats_service.dart';
+import 'package:flutter_wordle/game/game_logic.dart';
+import 'package:flutter_wordle/models/game_stats.dart';
 
 const c = LetterState.correct;
 const p = LetterState.present;
@@ -24,13 +24,17 @@ void main() {
 
   group('hardModeViolation', () {
     test('requires green letters to stay in place', () {
-      expect(hardModeViolation('trace', ['crane'], 'crate'),
-          '1st letter must be C');
+      expect(
+        hardModeViolation('trace', ['crane'], 'crate'),
+        '1st letter must be C',
+      );
     });
 
     test('requires yellow letters to be reused', () {
-      expect(hardModeViolation('scary', ['crane'], 'react'),
-          'Guess must contain E');
+      expect(
+        hardModeViolation('scary', ['crane'], 'react'),
+        'Guess must contain E',
+      );
     });
 
     test('allows a guess that uses every hint', () {
@@ -61,9 +65,10 @@ void main() {
     });
 
     test('the daily schedule dates 2000 unique 4-6 letter words', () {
-      final entries = (json.decode(
-              File('assets/daily_words.json').readAsStringSync()) as List)
-          .cast<Map<String, dynamic>>();
+      final entries =
+          (json.decode(File('assets/daily_words.json').readAsStringSync())
+                  as List)
+              .cast<Map<String, dynamic>>();
       expect(entries.length, 2000);
       final words = entries.map((e) => e['word'] as String).toList();
       expect(words.toSet().length, 2000);

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '../utils/game_logic.dart';
-import '../utils/stats_service.dart';
+import '../data/storage.dart';
+import '../game/game_logic.dart';
+import '../theme/app_theme.dart';
 import 'game_screen.dart';
 
-/// Month view of every daily puzzle. Past days can be opened (to play a missed
-/// day or review a finished one); future days stay locked until they arrive.
+/// Month view of every daily puzzle. Past days can be opened to catch up or
+/// review; future days stay locked until they arrive.
 class CalendarScreen extends StatefulWidget {
   final bool hardMode;
   const CalendarScreen({super.key, this.hardMode = false});
@@ -15,14 +16,20 @@ class CalendarScreen extends StatefulWidget {
 }
 
 class _CalendarScreenState extends State<CalendarScreen> {
-  static const accent = Color(0xFF0ff4c6);
-  static const win = Color(0xFF2ecc71);
-  static const loss = Color(0xFFff006e);
-  static const streakColor = Color(0xFFff9f1c);
-  static const weekdays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-  static const months = [
-    'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY',
-    'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER',
+  static const _weekdays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+  static const _months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
   ];
 
   late DateTime _month;
@@ -38,16 +45,17 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   Future<void> _load() async {
-    final now = DateTime.now();
-    final days = <String>[];
-    // Every day from launch to today, so the totals cover all months
-    for (var d = dayOnly(dailyLaunch);
-        !d.isAfter(dayOnly(now));
-        d = DateTime(d.year, d.month, d.day + 1)) {
-      days.add(dateKey(d));
-    }
-    final results = await DailyService.getResults(days);
-    final played = await DailyService.getPlayedDays();
+    final now = dayOnly(DateTime.now());
+    final days = [
+      for (
+        var d = dayOnly(dailyLaunch);
+        !d.isAfter(now);
+        d = DateTime(d.year, d.month, d.day + 1)
+      )
+        dateKey(d),
+    ];
+    final results = await Storage.instance.dailyResults(days);
+    final played = await Storage.instance.playedDays();
     if (!mounted) return;
     setState(() {
       _results = results;
@@ -55,162 +63,149 @@ class _CalendarScreenState extends State<CalendarScreen> {
     });
   }
 
-  bool get _canGoBack {
-    final launch = DateTime(dailyLaunch.year, dailyLaunch.month);
-    return _month.isAfter(launch);
-  }
+  bool get _canGoBack =>
+      _month.isAfter(DateTime(dailyLaunch.year, dailyLaunch.month));
 
   bool get _canGoForward {
     final now = DateTime.now();
     return _month.isBefore(DateTime(now.year, now.month));
   }
 
-  void _shiftMonth(int delta) {
-    setState(() => _month = DateTime(_month.year, _month.month + delta));
-  }
-
-  void _openDay(DateTime day) {
-    Navigator.push(
+  Future<void> _openDay(DateTime day) async {
+    await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => GameScreen(dailyDate: day, hardMode: widget.hardMode),
       ),
-    ).then((_) => _load());
+    );
+    _load();
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = GameColors.of(context);
     final now = DateTime.now();
     final wins = _results.values.where((r) => r > 0).length;
 
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF0f0f1e), Color(0xFF1a1a2e), Color(0xFF16213e)],
-          ),
-        ),
-        child: SafeArea(
-          child: Center(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 480),
-              child: ListView(
-                padding: EdgeInsets.all(16),
-                children: [
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.arrow_back_ios_new, color: accent),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                      SizedBox(width: 8),
-                      Text(
-                        'CALENDAR',
-                        style: TextStyle(
-                          color: accent,
-                          fontSize: 26,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 3,
-                          shadows: [
-                            Shadow(
-                              color: accent.withOpacity(0.5),
-                              blurRadius: 10,
+      appBar: AppBar(title: const Text('Calendar')),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 560),
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+              children: [
+                Row(
+                  children: [
+                    _Summary(
+                      icon: Icons.local_fire_department_rounded,
+                      color: colors.streak,
+                      value: '${dayStreak(_playedDays, now)}',
+                      label: 'Day streak',
+                    ),
+                    const SizedBox(width: 12),
+                    _Summary(
+                      icon: Icons.emoji_events_rounded,
+                      color: colors.present,
+                      value: '${bestDayStreak(_playedDays)}',
+                      label: 'Best streak',
+                    ),
+                    const SizedBox(width: 12),
+                    _Summary(
+                      icon: Icons.check_circle_rounded,
+                      color: colors.correct,
+                      value: '$wins',
+                      label: 'Solved',
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            IconButton(
+                              tooltip: 'Previous month',
+                              icon: const Icon(Icons.chevron_left_rounded),
+                              onPressed: _canGoBack
+                                  ? () => setState(
+                                      () => _month = DateTime(
+                                        _month.year,
+                                        _month.month - 1,
+                                      ),
+                                    )
+                                  : null,
+                            ),
+                            Expanded(
+                              child: Text(
+                                '${_months[_month.month - 1]} ${_month.year}',
+                                textAlign: TextAlign.center,
+                                style: theme.textTheme.titleMedium,
+                              ),
+                            ),
+                            IconButton(
+                              tooltip: 'Next month',
+                              icon: const Icon(Icons.chevron_right_rounded),
+                              onPressed: _canGoForward
+                                  ? () => setState(
+                                      () => _month = DateTime(
+                                        _month.year,
+                                        _month.month + 1,
+                                      ),
+                                    )
+                                  : null,
                             ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _Total(
-                        icon: Icons.local_fire_department,
-                        value: '${dayStreak(_playedDays, now)}',
-                        label: 'DAY STREAK',
-                        color: streakColor,
-                      ),
-                      _Total(
-                        icon: Icons.emoji_events,
-                        value: '${bestDayStreak(_playedDays)}',
-                        label: 'BEST STREAK',
-                        color: streakColor,
-                      ),
-                      _Total(
-                        icon: Icons.check_circle,
-                        value: '$wins/${_results.length}',
-                        label: 'SOLVED',
-                        color: accent,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 24),
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.chevron_left,
-                            color: accent.withOpacity(_canGoBack ? 1 : 0.2)),
-                        onPressed: _canGoBack ? () => _shiftMonth(-1) : null,
-                      ),
-                      Expanded(
-                        child: Text(
-                          '${months[_month.month - 1]} ${_month.year}',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 3,
-                          ),
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.chevron_right,
-                            color:
-                                accent.withOpacity(_canGoForward ? 1 : 0.2)),
-                        onPressed:
-                            _canGoForward ? () => _shiftMonth(1) : null,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 8),
-                  _buildGrid(now),
-                  SizedBox(height: 20),
-                  Wrap(
-                    alignment: WrapAlignment.center,
-                    spacing: 16,
-                    runSpacing: 8,
-                    children: [
-                      _Legend(color: win, label: 'Solved'),
-                      _Legend(color: loss, label: 'Missed'),
-                      _Legend(color: accent, label: 'Open', outlined: true),
-                      _Legend(
-                          icon: Icons.local_fire_department,
-                          color: streakColor,
-                          label: 'Played on the day'),
-                      _Legend(
-                          icon: Icons.lock,
-                          color: Colors.white38,
-                          label: 'Locked'),
-                    ],
-                  ),
-                  SizedBox(height: 12),
-                  Text(
-                    'Catching up on a past day adds to your stats, but only '
-                    'playing on the day keeps your streak going.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: accent.withOpacity(0.5),
-                      fontSize: 11,
+                        const SizedBox(height: 8),
+                        _buildGrid(context, now),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 16),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 16,
+                  runSpacing: 8,
+                  children: [
+                    _Legend(color: colors.correct, label: 'Solved'),
+                    _Legend(
+                      color: theme.colorScheme.error,
+                      label: 'Not solved',
+                    ),
+                    _Legend(
+                      color: theme.colorScheme.primary,
+                      label: 'Open',
+                      outlined: true,
+                    ),
+                    _Legend(
+                      icon: Icons.local_fire_department_rounded,
+                      color: colors.streak,
+                      label: 'Played on the day',
+                    ),
+                    _Legend(
+                      icon: Icons.lock_rounded,
+                      color: theme.colorScheme.onSurfaceVariant,
+                      label: 'Locked',
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Catching up on a past day counts in your stats. Only playing '
+                  'on the day keeps your streak going.',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -218,85 +213,99 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
-  Widget _buildGrid(DateTime now) {
+  Widget _buildGrid(BuildContext context, DateTime now) {
+    final theme = Theme.of(context);
     final daysInMonth = DateTime(_month.year, _month.month + 1, 0).day;
     final leading = _month.weekday - 1; // Monday first
-    final cells = <Widget>[
-      for (final w in weekdays)
-        Center(
-          child: Text(
-            w,
-            style: TextStyle(
-              color: accent.withOpacity(0.6),
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      for (int i = 0; i < leading; i++) SizedBox.shrink(),
-      for (int d = 1; d <= daysInMonth; d++)
-        _buildDay(DateTime(_month.year, _month.month, d), now),
-    ];
-
     return GridView.count(
       crossAxisCount: 7,
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       mainAxisSpacing: 6,
       crossAxisSpacing: 6,
-      children: cells,
+      children: [
+        for (final w in _weekdays)
+          Center(
+            child: Text(
+              w,
+              style: theme.textTheme.labelMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        for (int i = 0; i < leading; i++) const SizedBox.shrink(),
+        for (int d = 1; d <= daysInMonth; d++)
+          _buildDay(context, DateTime(_month.year, _month.month, d), now),
+      ],
     );
   }
 
-  Widget _buildDay(DateTime day, DateTime now) {
+  Widget _buildDay(BuildContext context, DateTime day, DateTime now) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final colors = GameColors.of(context);
     final key = dateKey(day);
     final isToday = key == dateKey(now);
-    final beforeLaunch = day.isBefore(dayOnly(dailyLaunch));
-    final unlocked = isDailyUnlocked(day, now);
     final result = _results[key];
 
-    if (beforeLaunch) {
+    if (day.isBefore(dayOnly(dailyLaunch))) {
       return Center(
         child: Text(
           '${day.day}',
-          style: TextStyle(color: Colors.white12),
+          style: TextStyle(
+            color: scheme.onSurfaceVariant.withValues(alpha: 0.3),
+          ),
         ),
       );
     }
 
-    if (!unlocked) {
+    if (!isDailyUnlocked(day, now)) {
       return Tooltip(
         message: 'Unlocks on this day',
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: Colors.white.withOpacity(0.03),
+            borderRadius: BorderRadius.circular(10),
+            color: scheme.surfaceContainer,
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('${day.day}', style: TextStyle(color: Colors.white24)),
-              Icon(Icons.lock, size: 12, color: Colors.white24),
+              Text(
+                '${day.day}',
+                style: TextStyle(
+                  color: scheme.onSurfaceVariant.withValues(alpha: 0.6),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Icon(
+                Icons.lock_rounded,
+                size: 11,
+                color: scheme.onSurfaceVariant.withValues(alpha: 0.5),
+              ),
             ],
           ),
         ),
       );
     }
 
-    final Color? fill = result == null ? null : (result > 0 ? win : loss);
-    return GestureDetector(
-      onTap: () => _openDay(day),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: fill?.withOpacity(0.8) ?? Colors.transparent,
-          border: Border.all(
-            color: isToday ? Colors.white : (fill ?? accent.withOpacity(0.5)),
-            width: isToday ? 2.5 : 1.5,
-          ),
-          boxShadow: isToday
-              ? [BoxShadow(color: accent.withOpacity(0.4), blurRadius: 10)]
-              : null,
+    final fill = result == null
+        ? null
+        : (result > 0 ? colors.correct : scheme.error);
+    return Material(
+      color: fill ?? Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: BorderSide(
+          color: isToday
+              ? scheme.primary
+              : (fill ?? scheme.primary.withValues(alpha: 0.35)),
+          width: isToday ? 2.5 : 1.5,
         ),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(10),
+        onTap: () => _openDay(day),
         child: Stack(
           children: [
             Center(
@@ -306,17 +315,17 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   Text(
                     '${day.day}',
                     style: TextStyle(
-                      color: fill == null ? accent : Colors.white,
-                      fontWeight: FontWeight.bold,
+                      color: fill == null ? scheme.onSurface : colors.onTile,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
                   if (result != null)
                     Text(
-                      result > 0 ? '$result/6' : 'X',
+                      result > 0 ? '$result/6' : '✕',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
-                        fontSize: 9,
-                        fontWeight: FontWeight.bold,
+                        color: colors.onTile,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                 ],
@@ -324,12 +333,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
             ),
             if (_playedDays.contains(key))
               Positioned(
-                top: 1,
-                right: 1,
+                top: 2,
+                right: 2,
                 child: Icon(
-                  Icons.local_fire_department,
+                  Icons.local_fire_department_rounded,
                   size: 12,
-                  color: streakColor,
+                  color: fill != null ? colors.onTile : colors.streak,
                 ),
               ),
           ],
@@ -339,43 +348,41 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 }
 
-class _Total extends StatelessWidget {
+class _Summary extends StatelessWidget {
   final IconData icon;
+  final Color color;
   final String value;
   final String label;
-  final Color color;
 
-  const _Total({
+  const _Summary({
     required this.icon,
+    required this.color,
     required this.value,
     required this.label,
-    required this.color,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Icon(icon, color: color, size: 22),
-        SizedBox(height: 4),
-        Text(
-          value,
-          style: TextStyle(
-            color: color,
-            fontSize: 24,
-            fontWeight: FontWeight.w900,
+    final theme = Theme.of(context);
+    return Expanded(
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          child: Column(
+            children: [
+              Icon(icon, color: color),
+              const SizedBox(height: 4),
+              Text(value, style: theme.textTheme.titleLarge),
+              Text(
+                label,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
           ),
         ),
-        Text(
-          label,
-          style: TextStyle(
-            color: Colors.white.withOpacity(0.6),
-            fontSize: 9,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.5,
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
@@ -395,6 +402,7 @@ class _Legend extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -409,10 +417,12 @@ class _Legend extends StatelessWidget {
                   border: Border.all(color: color, width: 1.5),
                 ),
               ),
-        SizedBox(width: 4),
+        const SizedBox(width: 5),
         Text(
           label,
-          style: TextStyle(color: Colors.white70, fontSize: 11),
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
         ),
       ],
     );

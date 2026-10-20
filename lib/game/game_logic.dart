@@ -42,7 +42,10 @@ String ordinal(int n) {
 /// Hard mode: every revealed hint must be used in later guesses. Returns a
 /// message describing the first broken rule, or null if [guess] is allowed.
 String? hardModeViolation(
-    String guess, List<String> previousGuesses, String target) {
+  String guess,
+  List<String> previousGuesses,
+  String target,
+) {
   for (final prev in previousGuesses) {
     final states = scoreGuess(prev, target);
 
@@ -83,8 +86,11 @@ DateTime dayOnly(DateTime date) => DateTime(date.year, date.month, date.day);
 /// Puzzle number for a calendar date, counting from [dailyLaunch] as #1.
 int dailyNumber(DateTime date) {
   final day = DateTime.utc(date.year, date.month, date.day);
-  final launch =
-      DateTime.utc(dailyLaunch.year, dailyLaunch.month, dailyLaunch.day);
+  final launch = DateTime.utc(
+    dailyLaunch.year,
+    dailyLaunch.month,
+    dailyLaunch.day,
+  );
   return day.difference(launch).inDays + 1;
 }
 
@@ -124,7 +130,9 @@ int bestDayStreak(Set<String> playedDays) {
   var best = 0, run = 0;
   DateTime? prev;
   for (final d in days) {
-    final next = prev == null ? null : DateTime(prev.year, prev.month, prev.day + 1);
+    final next = prev == null
+        ? null
+        : DateTime(prev.year, prev.month, prev.day + 1);
     run = (next != null && dateKey(next) == dateKey(d)) ? run + 1 : 1;
     if (run > best) best = run;
     prev = d;
@@ -146,23 +154,26 @@ String shareText({
   final title = dailyDate != null
       ? 'Wordle Future #${dailyNumber(dailyDate)}'
       : 'Wordle Future';
-  final score = '${won ? guesses.length : 'X'}/$maxAttempts${hardMode ? '*' : ''}';
+  final score =
+      '${won ? guesses.length : 'X'}/$maxAttempts${hardMode ? '*' : ''}';
   final hints = hintsUsed > 0
       ? ' · $hintsUsed hint${hintsUsed == 1 ? '' : 's'}'
       : '';
 
-  final rows = guesses.map((g) {
-    return scoreGuess(g, target).map((s) {
-      switch (s) {
-        case LetterState.correct:
-          return '🟩';
-        case LetterState.present:
-          return '🟨';
-        case LetterState.absent:
-          return '⬛';
-      }
-    }).join();
-  }).join('\n');
+  final rows = guesses
+      .map((g) {
+        return scoreGuess(g, target).map((s) {
+          switch (s) {
+            case LetterState.correct:
+              return '🟩';
+            case LetterState.present:
+              return '🟨';
+            case LetterState.absent:
+              return '⬛';
+          }
+        }).join();
+      })
+      .join('\n');
 
   return '$title · $wordLength letters · $score$hints\n\n$rows';
 }
