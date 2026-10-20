@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 
 import 'dart:math' as math;
 import 'game_screen.dart';
+import '../utils/game_logic.dart';
+import '../utils/stats_service.dart';
 import '../utils/word_loader.dart';
+import '../widgets/stats_panel.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,6 +20,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late AnimationController _backgroundController;
   late AnimationController _pulseController;
   int _points = 0;
+  bool _daily = true;
+  bool _hardMode = false;
+  // Today's daily result per word length: guesses used, 0 for a loss.
+  Map<int, int?> _dailyResults = {};
 
   @override
   void initState() {
@@ -32,6 +39,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     )..repeat(reverse: true);
 
     _loadPoints();
+    SettingsService.getHardMode().then((v) {
+      if (mounted) setState(() => _hardMode = v);
+    });
   }
 
   @override
@@ -43,8 +53,103 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   Future<void> _loadPoints() async {
     final p = await PointsService.getPoints();
+    final today = dateKey(DateTime.now());
+    final results = <int, int?>{};
+    for (final len in [4, 5, 6]) {
+      results[len] = await DailyService.getResult(len, today);
+    }
     if (!mounted) return;
-    setState(() => _points = p);
+    setState(() {
+      _points = p;
+      _dailyResults = results;
+    });
+  }
+
+  String? _subtitleFor(int letters) {
+    if (!_daily) return 'UNLIMITED PLAY';
+    final result = _dailyResults[letters];
+    if (result == null) return 'DAILY · READY';
+    return result == 0 ? 'DAILY · MISSED' : 'DAILY · SOLVED $result/6';
+  }
+
+  Widget _buildModeToggle() {
+    const accent = Color(0xFF0ff4c6);
+    Widget option(String label, bool value) {
+      final selected = _daily == value;
+      return GestureDetector(
+        onTap: () => setState(() => _daily = value),
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 200),
+          padding: EdgeInsets.symmetric(horizontal: 22, vertical: 10),
+          decoration: BoxDecoration(
+            color: selected ? accent.withOpacity(0.25) : Colors.transparent,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: selected ? accent : accent.withOpacity(0.5),
+              fontWeight: FontWeight.bold,
+              letterSpacing: 2,
+              fontSize: 13,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        Container(
+          padding: EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: accent.withOpacity(0.6), width: 2),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [option('DAILY', true), option('UNLIMITED', false)],
+          ),
+        ),
+        SizedBox(height: 12),
+        GestureDetector(
+          onTap: () {
+            setState(() => _hardMode = !_hardMode);
+            SettingsService.setHardMode(_hardMode);
+          },
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Switch(
+                value: _hardMode,
+                activeColor: Color(0xFFff006e),
+                onChanged: (v) {
+                  setState(() => _hardMode = v);
+                  SettingsService.setHardMode(v);
+                },
+              ),
+              Text(
+                'HARD MODE',
+                style: TextStyle(
+                  color: _hardMode
+                      ? Color(0xFFff006e)
+                      : accent.withOpacity(0.6),
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 2,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Text(
+          _hardMode
+              ? 'Revealed hints must be used · +3 bonus points'
+              : 'Hints you find can be ignored',
+          style: TextStyle(color: accent.withOpacity(0.45), fontSize: 11),
+        ),
+      ],
+    );
   }
 
   @override
@@ -110,9 +215,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 letterSpacing: 4,
                               ),
                             ),
-                            SizedBox(height: 50),
+                            SizedBox(height: 20),
+                            _buildModeToggle(),
+                            SizedBox(height: 30),
                             _FuturisticButton(
                               letters: 4,
+                              daily: _daily,
+                              hardMode: _hardMode,
+                              subtitle: _subtitleFor(4),
                               delay: 0,
                               pulseAnimation: _pulseController,
                               onReturn: _loadPoints,
@@ -120,6 +230,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             SizedBox(height: 24),
                             _FuturisticButton(
                               letters: 5,
+                              daily: _daily,
+                              hardMode: _hardMode,
+                              subtitle: _subtitleFor(5),
                               delay: 150,
                               pulseAnimation: _pulseController,
                               onReturn: _loadPoints,
@@ -127,6 +240,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             SizedBox(height: 24),
                             _FuturisticButton(
                               letters: 6,
+                              daily: _daily,
+                              hardMode: _hardMode,
+                              subtitle: _subtitleFor(6),
                               delay: 300,
                               pulseAnimation: _pulseController,
                               onReturn: _loadPoints,
@@ -245,6 +361,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                 ),
               ),
+              SizedBox(height: 8),
+              TextButton.icon(
+                onPressed: () => showDialog(
+                  context: context,
+                  builder: (_) => StatsDialog(),
+                ),
+                icon: Icon(Icons.bar_chart, color: Color(0xFF0ff4c6)),
+                label: Text(
+                  'STATS',
+                  style: TextStyle(
+                    color: Color(0xFF0ff4c6),
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 2,
+                  ),
+                ),
+              ),
             ],
           ),
         );
@@ -258,12 +390,18 @@ class _FuturisticButton extends StatefulWidget {
   final int delay;
   final AnimationController pulseAnimation;
   final VoidCallback? onReturn;
+  final bool daily;
+  final bool hardMode;
+  final String? subtitle;
 
   const _FuturisticButton({
     required this.letters,
     required this.delay,
     required this.pulseAnimation,
     this.onReturn,
+    this.daily = false,
+    this.hardMode = false,
+    this.subtitle,
   });
 
   @override
@@ -341,7 +479,11 @@ class __FuturisticButtonState extends State<_FuturisticButton>
               context,
               PageRouteBuilder(
                 pageBuilder: (context, animation, secondaryAnimation) =>
-                    GameScreen(wordLength: widget.letters),
+                    GameScreen(
+                      wordLength: widget.letters,
+                      daily: widget.daily,
+                      hardMode: widget.hardMode,
+                    ),
                 transitionsBuilder:
                     (context, animation, secondaryAnimation, child) {
                   return FadeTransition(
@@ -498,6 +640,16 @@ class __FuturisticButtonState extends State<_FuturisticButton>
                                         letterSpacing: 2,
                                       ),
                                     ),
+                                    if (widget.subtitle != null)
+                                      Text(
+                                        widget.subtitle!,
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                          color: difficultyColor.withOpacity(0.8),
+                                          letterSpacing: 1.5,
+                                        ),
+                                      ),
                                   ],
                                 ),
                               ),
