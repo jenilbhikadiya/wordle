@@ -10,12 +10,14 @@ import '../widgets/stats_panel.dart';
 import 'dart:math' as math;
 
 class GameScreen extends StatefulWidget {
+  // Used for unlimited play; a daily puzzle takes the length of its word.
   final int wordLength;
-  final bool daily;
+  // The calendar day of the daily puzzle, or null for unlimited play.
+  final DateTime? dailyDate;
   final bool hardMode;
   GameScreen({
-    required this.wordLength,
-    this.daily = false,
+    this.wordLength = 5,
+    this.dailyDate,
     this.hardMode = false,
   });
 
@@ -34,12 +36,16 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   int currentCol = 0;
   Map<String, Color> keyColors = {};
   bool loaded = false;
+  // Consecutive days the daily puzzle was played, shown after a daily game.
+  int dayStreak = 0;
   bool gameOver = false;
   String feedbackMessage = '';
   bool feedbackIsInfo = false;
   // Positions of target letters revealed with hints.
   Set<int> hintPositions = {};
-  late String dailyDate;
+  late int wordLength;
+  bool get daily => widget.dailyDate != null;
+  late String dayKey;
   late AnimationController _shakeController;
   late AnimationController _pulseController;
   late AnimationController _particleController;
@@ -80,18 +86,26 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
   Future<void> _startGame() async {
     // Load full dictionary for validation
-    final words = await WordLoader.loadWords(widget.wordLength);
+    String? dailyTarget;
+    if (daily) {
+      // Each calendar day has its own word from the daily list
+      final dailyWords = await WordLoader.loadDailyWords();
+      dailyTarget = dailyWord(dailyWords, widget.dailyDate!);
+      wordLength = dailyTarget.length;
+      dayKey = dateKey(widget.dailyDate!);
+    } else {
+      wordLength = widget.wordLength;
+    }
+
+    final words = await WordLoader.loadWords(wordLength);
 
     // Load easy words for target selection
-    final easyWords = await WordLoader.loadEasyWords(widget.wordLength);
+    final easyWords = await WordLoader.loadEasyWords(wordLength);
     final easyWordsList = easyWords.map((e) => e.toLowerCase()).toList();
     dictionary = {...words, ...easyWordsList};
 
-    final now = DateTime.now();
-    dailyDate = dateKey(now);
-    if (widget.daily) {
-      // Same word for everyone today
-      target = dailyWord(easyWordsList, widget.wordLength, now);
+    if (dailyTarget != null) {
+      target = dailyTarget;
     } else {
       // Pick random target from easy words
       target = (easyWordsList..shuffle()).first;
@@ -99,7 +113,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
     board = List.generate(
       maxAttempts,
-      (_) => List.generate(widget.wordLength, (_) => ''),
+      (_) => List.generate(wordLength, (_) => ''),
     );
     guesses = [];
     keyColors = {};
@@ -110,10 +124,10 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     feedbackMessage = '';
 
     // Restore today's daily progress, if any
-    if (widget.daily) {
-      final saved = await DailyService.getGuesses(widget.wordLength, dailyDate);
+    if (daily) {
+      final saved = await DailyService.getGuesses(dayKey);
       for (final g in saved) {
-        if (guesses.length >= maxAttempts || g.length != widget.wordLength)
+        if (guesses.length >= maxAttempts || g.length != wordLength)
           break;
         board[guesses.length] = g.split('');
         guesses.add(g);
@@ -122,8 +136,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       final finished = guesses.isNotEmpty &&
           (guesses.last == target || guesses.length >= maxAttempts);
       currentRow = finished ? guesses.length - 1 : guesses.length;
-      hintPositions = (await DailyService.getHints(widget.wordLength, dailyDate))
-          .where((i) => i >= 0 && i < widget.wordLength)
+      hintPositions = (await DailyService.getHints(dayKey))
+          .where((i) => i >= 0 && i < wordLength)
           .toSet();
     }
 
@@ -131,11 +145,12 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     if (!mounted) return;
     setState(() {});
 
-    if (widget.daily && guesses.isNotEmpty) {
+    if (daily && guesses.isNotEmpty) {
       final won = guesses.last == target;
       if (won || guesses.length >= maxAttempts) {
         gameOver = true;
-        final stats = await StatsService.getStats(widget.wordLength);
+        final stats = await StatsService.getStats(wordLength);
+        dayStreak = await DailyService.currentDayStreak(DateTime.now());
         if (mounted) _showEndDialog(won: won, stats: stats);
       }
     }
@@ -155,7 +170,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       _submitGuess();
       return;
     }
-    if (currentCol < widget.wordLength) {
+    if (currentCol < wordLength) {
       setState(() {
         board[currentRow][currentCol] = k;
         currentCol++;
@@ -189,7 +204,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
   void _updateKeyColors(String guess) {
     final resultColors = _colorForGuess(guess, target);
-    for (int i = 0; i < widget.wordLength; i++) {
+    for (int i = 0; i < wordLength; i++) {
       final ch = guess[i];
       final color = resultColors[i];
       final existing = keyColors[ch];
@@ -205,7 +220,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
   void _submitGuess() async {
     final guess = board[currentRow].join('').toLowerCase();
-    if (guess.length != widget.wordLength) {
+    if (guess.length != wordLength) {
       _showFeedback('Complete the word!');
       _shakeController.forward(from: 0);
       return;
@@ -226,8 +241,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
     guesses.add(guess);
     _updateKeyColors(guess);
-    if (widget.daily) {
-      DailyService.saveGuesses(widget.wordLength, dailyDate, guesses);
+    if (daily) {
+      DailyService.saveGuesses(dayKey, guesses);
     }
 
     final won = guess == target;
@@ -243,20 +258,17 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
     if (won || lost) {
       final stats = await StatsService.recordGame(
-        widget.wordLength,
+        wordLength,
         won: won,
         attempts: guesses.length,
       );
-      if (widget.daily) {
-        await DailyService.saveResult(
-          widget.wordLength,
-          dailyDate,
-          won ? guesses.length : 0,
-        );
+      if (daily) {
+        await DailyService.saveResult(dayKey, won ? guesses.length : 0);
+        dayStreak = await DailyService.currentDayStreak(DateTime.now());
       }
       // Let the tile flip finish before the dialog covers it
       await Future.delayed(
-        Duration(milliseconds: 100 * widget.wordLength + 700),
+        Duration(milliseconds: 100 * wordLength + 700),
       );
       if (mounted) _showEndDialog(won: won, stats: stats);
       return;
@@ -268,7 +280,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
   // Hard mode earns a bonus, every hint used costs some of the reward.
   int _pointsForWin() {
-    final base = PointsService.pointsForLength(widget.wordLength);
+    final base = PointsService.pointsForLength(wordLength);
     final bonus = widget.hardMode ? 3 : 0;
     return math.max(1, base + bonus - hintPositions.length * 2);
   }
@@ -282,12 +294,12 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     // Only reveal letters the player has not already placed
     final solved = <int>{};
     for (final g in guesses) {
-      for (int i = 0; i < widget.wordLength; i++) {
+      for (int i = 0; i < wordLength; i++) {
         if (g[i] == target[i]) solved.add(i);
       }
     }
     final candidates = List<int>.generate(
-      widget.wordLength,
+      wordLength,
       (i) => i,
     ).where((i) => !solved.contains(i) && !hintPositions.contains(i)).toList();
     if (candidates.isEmpty) {
@@ -296,8 +308,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     }
     candidates.shuffle();
     setState(() => hintPositions.add(candidates.first));
-    if (widget.daily) {
-      DailyService.saveHints(widget.wordLength, dailyDate, hintPositions);
+    if (daily) {
+      DailyService.saveHints(dayKey, hintPositions);
     }
     _showFeedback('Hint costs 2 points from your reward', info: true);
   }
@@ -318,12 +330,12 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     final text = shareText(
       guesses: guesses,
       target: target,
-      wordLength: widget.wordLength,
+      wordLength: wordLength,
       maxAttempts: maxAttempts,
       won: guesses.isNotEmpty && guesses.last == target,
       hardMode: widget.hardMode,
       hintsUsed: hintPositions.length,
-      dailyDate: widget.daily ? DateTime.now() : null,
+      dailyDate: widget.dailyDate,
     );
     await Clipboard.setData(ClipboardData(text: text));
   }
@@ -335,6 +347,13 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     final h = diff.inHours;
     final m = diff.inMinutes % 60;
     return '${h}h ${m}m';
+  }
+
+  String _dailyFooter(int streak) {
+    final today = dateKey(DateTime.now()) == dayKey;
+    final days = '$streak day${streak == 1 ? '' : 's'}';
+    if (!today) return 'Archive puzzle · day streak $days';
+    return 'Day streak: $days\nNext daily in ${_timeUntilNextDaily()}';
   }
 
   void _showEndDialog({required bool won, required GameStats stats}) {
@@ -350,12 +369,12 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
         isWin: won,
         stats: stats,
         highlightAttempt: won ? guesses.length : null,
-        footer: widget.daily ? 'Next daily in ${_timeUntilNextDaily()}' : null,
+        footer: daily ? _dailyFooter(dayStreak) : null,
         onShare: _share,
-        actionLabel: widget.daily ? 'MENU' : 'PLAY AGAIN',
+        actionLabel: daily ? 'DONE' : 'PLAY AGAIN',
         onPlayAgain: () {
           Navigator.pop(context);
-          if (widget.daily) {
+          if (daily) {
             Navigator.pop(context);
             return;
           }
@@ -391,7 +410,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
         children: [
           Icon(Icons.lightbulb, color: Color(0xFFffd60a), size: 16),
           SizedBox(width: 8),
-          for (int i = 0; i < widget.wordLength; i++)
+          for (int i = 0; i < wordLength; i++)
             Container(
               margin: EdgeInsets.symmetric(horizontal: 2),
               width: 22,
@@ -507,11 +526,11 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                       Column(
                         children: [
                           _FuturisticAppBar(
-                            wordLength: widget.wordLength,
+                            wordLength: wordLength,
                             currentAttempt: currentRow + 1,
                             maxAttempts: maxAttempts,
                             pulseAnimation: _pulseController,
-                            daily: widget.daily,
+                            dailyNumber: daily ? dailyNumber(widget.dailyDate!) : null,
                             hardMode: widget.hardMode,
                             hintsLeft: maxHints - hintPositions.length,
                             onHint: gameOver ? null : _useHint,
@@ -572,7 +591,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                               children: List.generate(maxAttempts, (r) {
                                 return Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  children: List.generate(widget.wordLength, (
+                                  children: List.generate(wordLength, (
                                     c,
                                   ) {
                                     final letter = board[r][c];
@@ -614,7 +633,7 @@ class _FuturisticAppBar extends StatelessWidget {
   final int currentAttempt;
   final int maxAttempts;
   final AnimationController pulseAnimation;
-  final bool daily;
+  final int? dailyNumber;
   final bool hardMode;
   final int hintsLeft;
   final VoidCallback? onHint;
@@ -624,7 +643,7 @@ class _FuturisticAppBar extends StatelessWidget {
     required this.currentAttempt,
     required this.maxAttempts,
     required this.pulseAnimation,
-    this.daily = false,
+    this.dailyNumber,
     this.hardMode = false,
     this.hintsLeft = 0,
     this.onHint,
@@ -669,7 +688,7 @@ class _FuturisticAppBar extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '$wordLength LETTERS · ${daily ? 'DAILY' : 'UNLIMITED'}${hardMode ? ' · HARD' : ''}',
+                  '$wordLength LETTERS · ${dailyNumber != null ? 'DAILY #$dailyNumber' : 'UNLIMITED'}${hardMode ? ' · HARD' : ''}',
                   style: TextStyle(
                     color: Color(0xFF0ff4c6).withOpacity(0.6),
                     fontSize: 10,

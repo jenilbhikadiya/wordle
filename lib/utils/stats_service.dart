@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'game_logic.dart';
+
 class GameStats {
   int played;
   int wins;
@@ -80,44 +82,71 @@ class StatsService {
   }
 }
 
-/// Saves the guesses made on each daily puzzle so it can only be played once
-/// a day, and so a half-finished daily is restored when reopened.
+/// Saves the guesses made on each daily puzzle so it can only be played once,
+/// and so a half-finished daily is restored when reopened. Puzzles are keyed
+/// by their calendar date (see dateKey).
 class DailyService {
-  static String _key(int length, String date) => 'daily_${length}_$date';
+  static const String _playedDaysKey = 'daily_played_days';
+  static String _key(String day) => 'daily_$day';
 
-  static Future<List<String>> getGuesses(int length, String date) async {
+  static Future<List<String>> getGuesses(String day) async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getStringList(_key(length, date)) ?? [];
+    return prefs.getStringList(_key(day)) ?? [];
   }
 
-  static Future<void> saveGuesses(
-      int length, String date, List<String> guesses) async {
+  static Future<void> saveGuesses(String day, List<String> guesses) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(_key(length, date), guesses);
+    await prefs.setStringList(_key(day), guesses);
   }
 
-  static Future<List<int>> getHints(int length, String date) async {
+  static Future<List<int>> getHints(String day) async {
     final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getStringList('${_key(length, date)}_hints') ?? [];
+    final raw = prefs.getStringList('${_key(day)}_hints') ?? [];
     return raw.map(int.tryParse).whereType<int>().toList();
   }
 
-  static Future<void> saveHints(int length, String date, Set<int> hints) async {
+  static Future<void> saveHints(String day, Set<int> hints) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setStringList(
-        '${_key(length, date)}_hints', hints.map((h) => '$h').toList());
+        '${_key(day)}_hints', hints.map((h) => '$h').toList());
   }
 
   /// Number of guesses it took to solve, 0 for a loss, null if unfinished.
-  static Future<int?> getResult(int length, String date) async {
+  static Future<int?> getResult(String day) async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getInt('${_key(length, date)}_result');
+    return prefs.getInt('${_key(day)}_result');
   }
 
-  static Future<void> saveResult(int length, String date, int result) async {
+  /// Results for many days at once, for the calendar.
+  static Future<Map<String, int>> getResults(Iterable<String> days) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('${_key(length, date)}_result', result);
+    final results = <String, int>{};
+    for (final day in days) {
+      final r = prefs.getInt('${_key(day)}_result');
+      if (r != null) results[day] = r;
+    }
+    return results;
   }
+
+  /// Stores a finished puzzle. Only a puzzle finished on its own day counts
+  /// toward the day streak, so catching up from the calendar does not.
+  static Future<void> saveResult(String day, int result) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('${_key(day)}_result', result);
+    if (day == dateKey(DateTime.now())) {
+      final played = {...prefs.getStringList(_playedDaysKey) ?? <String>[]};
+      played.add(day);
+      await prefs.setStringList(_playedDaysKey, played.toList()..sort());
+    }
+  }
+
+  static Future<Set<String>> getPlayedDays() async {
+    final prefs = await SharedPreferences.getInstance();
+    return {...prefs.getStringList(_playedDaysKey) ?? <String>[]};
+  }
+
+  static Future<int> currentDayStreak(DateTime now) async =>
+      dayStreak(await getPlayedDays(), now);
 }
 
 class SettingsService {

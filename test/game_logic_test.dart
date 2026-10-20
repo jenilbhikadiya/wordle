@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_wordle/utils/game_logic.dart';
@@ -35,12 +38,49 @@ void main() {
     });
   });
 
-  test('dailyWord is stable for a date and changes day to day', () {
-    final words = List.generate(500, (i) => 'w$i');
-    final day = DateTime(2026, 10, 20);
-    expect(dailyWord(words, 5, day), dailyWord(words, 5, day));
-    expect(dailyWord(words, 5, day),
-        isNot(dailyWord(words, 5, day.add(Duration(days: 1)))));
+  group('daily puzzles', () {
+    final launch = DateTime(2026, 10, 20);
+    final words = List.generate(1500, (i) => 'w$i');
+
+    test('the launch day is puzzle #1 and each day gets a new word', () {
+      expect(dailyNumber(launch), 1);
+      expect(dailyWord(words, launch), 'w0');
+      expect(dailyWord(words, DateTime(2026, 10, 21, 23, 59)), 'w1');
+      final seen = {
+        for (int i = 0; i < 1500; i++)
+          dailyWord(words, DateTime(2026, 10, 20 + i)),
+      };
+      expect(seen.length, 1500);
+    });
+
+    test('the daily word list has 1500 unique 4-6 letter words', () {
+      final list = (json.decode(
+              File('assets/daily_words.json').readAsStringSync()) as List)
+          .cast<String>();
+      expect(list.length, 1500);
+      expect(list.toSet().length, 1500);
+      expect(list.every((w) => RegExp(r'^[a-z]{4,6}$').hasMatch(w)), isTrue);
+      expect(list.map((w) => w.length).toSet(), {4, 5, 6});
+    });
+
+    test('future days stay locked', () {
+      final now = DateTime(2026, 11, 3, 9);
+      expect(isDailyUnlocked(DateTime(2026, 11, 3), now), isTrue);
+      expect(isDailyUnlocked(DateTime(2026, 10, 25), now), isTrue);
+      expect(isDailyUnlocked(DateTime(2026, 11, 4), now), isFalse);
+      expect(isDailyUnlocked(DateTime(2026, 10, 19), now), isFalse);
+    });
+
+    test('day streak counts consecutive played days', () {
+      final played = {'2026-10-28', '2026-10-30', '2026-10-31', '2026-11-01'};
+      // Today not played yet: the streak through yesterday still stands
+      expect(dayStreak(played, DateTime(2026, 11, 2, 8)), 3);
+      expect(dayStreak({...played, '2026-11-02'}, DateTime(2026, 11, 2)), 4);
+      // Missing yesterday and today breaks it
+      expect(dayStreak(played, DateTime(2026, 11, 3)), 0);
+      expect(bestDayStreak(played), 3);
+      expect(bestDayStreak({}), 0);
+    });
   });
 
   test('shareText renders an emoji grid', () {

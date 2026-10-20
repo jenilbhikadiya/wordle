@@ -15,6 +15,13 @@ class WordLoader {
     return arr.map((e) => e.toString().toLowerCase()).toList();
   }
 
+  // Daily puzzle words: 1500 mixed-length words, one per calendar day
+  static Future<List<String>> loadDailyWords() async {
+    final raw = await rootBundle.loadString('assets/daily_words.json');
+    final List<dynamic> arr = json.decode(raw);
+    return arr.map((e) => e.toString().toLowerCase()).toList();
+  }
+
   // Load easy words (for target selection)
   static Future<List<String>> loadEasyWords(int length) async {
     final path = length == 4

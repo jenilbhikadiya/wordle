@@ -8,6 +8,7 @@ import '../utils/game_logic.dart';
 import '../utils/stats_service.dart';
 import '../utils/word_loader.dart';
 import '../widgets/stats_panel.dart';
+import 'calendar_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -22,8 +23,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   int _points = 0;
   bool _daily = true;
   bool _hardMode = false;
-  // Today's daily result per word length: guesses used, 0 for a loss.
-  Map<int, int?> _dailyResults = {};
+  // Today's daily puzzle: its word length and result (guesses used, 0 for a
+  // loss, null if not finished yet).
+  int? _todayLength;
+  int? _todayResult;
+  int _dayStreak = 0;
 
   @override
   void initState() {
@@ -53,23 +57,72 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   Future<void> _loadPoints() async {
     final p = await PointsService.getPoints();
-    final today = dateKey(DateTime.now());
-    final results = <int, int?>{};
-    for (final len in [4, 5, 6]) {
-      results[len] = await DailyService.getResult(len, today);
-    }
+    final now = DateTime.now();
+    final words = await WordLoader.loadDailyWords();
+    final result = await DailyService.getResult(dateKey(now));
+    final streak = await DailyService.currentDayStreak(now);
     if (!mounted) return;
     setState(() {
       _points = p;
-      _dailyResults = results;
+      _todayLength = dailyWord(words, now).length;
+      _todayResult = result;
+      _dayStreak = streak;
     });
   }
 
-  String? _subtitleFor(int letters) {
-    if (!_daily) return 'UNLIMITED PLAY';
-    final result = _dailyResults[letters];
-    if (result == null) return 'DAILY · READY';
-    return result == 0 ? 'DAILY · MISSED' : 'DAILY · SOLVED $result/6';
+  String get _todaySubtitle {
+    final length = _todayLength == null ? '' : '$_todayLength LETTERS · ';
+    if (_todayResult == null) return '${length}READY';
+    return _todayResult == 0 ? '${length}MISSED' : '${length}SOLVED $_todayResult/6';
+  }
+
+  Widget _buildDailyButtons() {
+    const accent = Color(0xFF0ff4c6);
+    return Column(
+      children: [
+        _FuturisticButton(
+          key: ValueKey('daily'),
+          letters: _todayLength ?? 5,
+          title: 'DAILY #${dailyNumber(DateTime.now())}',
+          subtitle: _todaySubtitle,
+          dailyDate: dayOnly(DateTime.now()),
+          hardMode: _hardMode,
+          delay: 0,
+          pulseAnimation: _pulseController,
+          onReturn: _loadPoints,
+        ),
+        SizedBox(height: 20),
+        OutlinedButton.icon(
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => CalendarScreen(hardMode: _hardMode),
+            ),
+          ).then((_) => _loadPoints()),
+          icon: Icon(Icons.calendar_month, color: accent),
+          label: Text(
+            'CALENDAR',
+            style: TextStyle(
+              color: accent,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 2,
+            ),
+          ),
+          style: OutlinedButton.styleFrom(
+            side: BorderSide(color: accent.withOpacity(0.6), width: 2),
+            padding: EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+          ),
+        ),
+        SizedBox(height: 10),
+        Text(
+          'A new puzzle unlocks every day at midnight',
+          style: TextStyle(color: accent.withOpacity(0.45), fontSize: 11),
+        ),
+      ],
+    );
   }
 
   Widget _buildModeToggle() {
@@ -218,35 +271,39 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             SizedBox(height: 20),
                             _buildModeToggle(),
                             SizedBox(height: 30),
-                            _FuturisticButton(
-                              letters: 4,
-                              daily: _daily,
-                              hardMode: _hardMode,
-                              subtitle: _subtitleFor(4),
-                              delay: 0,
-                              pulseAnimation: _pulseController,
-                              onReturn: _loadPoints,
-                            ),
-                            SizedBox(height: 24),
-                            _FuturisticButton(
-                              letters: 5,
-                              daily: _daily,
-                              hardMode: _hardMode,
-                              subtitle: _subtitleFor(5),
-                              delay: 150,
-                              pulseAnimation: _pulseController,
-                              onReturn: _loadPoints,
-                            ),
-                            SizedBox(height: 24),
-                            _FuturisticButton(
-                              letters: 6,
-                              daily: _daily,
-                              hardMode: _hardMode,
-                              subtitle: _subtitleFor(6),
-                              delay: 300,
-                              pulseAnimation: _pulseController,
-                              onReturn: _loadPoints,
-                            ),
+                            if (_daily)
+                              _buildDailyButtons()
+                            else ...[
+                              _FuturisticButton(
+                                key: ValueKey(4),
+                                letters: 4,
+                                hardMode: _hardMode,
+                                subtitle: 'UNLIMITED PLAY',
+                                delay: 0,
+                                pulseAnimation: _pulseController,
+                                onReturn: _loadPoints,
+                              ),
+                              SizedBox(height: 24),
+                              _FuturisticButton(
+                                key: ValueKey(5),
+                                letters: 5,
+                                hardMode: _hardMode,
+                                subtitle: 'UNLIMITED PLAY',
+                                delay: 150,
+                                pulseAnimation: _pulseController,
+                                onReturn: _loadPoints,
+                              ),
+                              SizedBox(height: 24),
+                              _FuturisticButton(
+                                key: ValueKey(6),
+                                letters: 6,
+                                hardMode: _hardMode,
+                                subtitle: 'UNLIMITED PLAY',
+                                delay: 300,
+                                pulseAnimation: _pulseController,
+                                onReturn: _loadPoints,
+                              ),
+                            ],
                           ],
                         ),
 
@@ -344,22 +401,57 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
               ),
               SizedBox(height: 12),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Color(0xFF0ff4c6), width: 2),
-                  color: Color(0xFF0ff4c6).withOpacity(0.1),
-                ),
-                child: Text(
-                  'POINTS: $_points',
-                  style: TextStyle(
-                    color: Color(0xFF0ff4c6),
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 2,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Color(0xFF0ff4c6), width: 2),
+                      color: Color(0xFF0ff4c6).withOpacity(0.1),
+                    ),
+                    child: Text(
+                      'POINTS: $_points',
+                      style: TextStyle(
+                        color: Color(0xFF0ff4c6),
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 2,
+                      ),
+                    ),
                   ),
-                ),
+                  SizedBox(width: 10),
+                  // Consecutive days the daily puzzle was played
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Color(0xFFff9f1c), width: 2),
+                      color: Color(0xFFff9f1c).withOpacity(0.1),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.local_fire_department,
+                          color: Color(0xFFff9f1c),
+                          size: 18,
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          '$_dayStreak DAY${_dayStreak == 1 ? '' : 'S'}',
+                          style: TextStyle(
+                            color: Color(0xFFff9f1c),
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
               SizedBox(height: 8),
               TextButton.icon(
@@ -390,16 +482,20 @@ class _FuturisticButton extends StatefulWidget {
   final int delay;
   final AnimationController pulseAnimation;
   final VoidCallback? onReturn;
-  final bool daily;
+  // Set for the daily puzzle button; null for unlimited play.
+  final DateTime? dailyDate;
+  final String? title;
   final bool hardMode;
   final String? subtitle;
 
   const _FuturisticButton({
+    super.key,
     required this.letters,
     required this.delay,
     required this.pulseAnimation,
     this.onReturn,
-    this.daily = false,
+    this.dailyDate,
+    this.title,
     this.hardMode = false,
     this.subtitle,
   });
@@ -481,7 +577,7 @@ class __FuturisticButtonState extends State<_FuturisticButton>
                 pageBuilder: (context, animation, secondaryAnimation) =>
                     GameScreen(
                       wordLength: widget.letters,
-                      daily: widget.daily,
+                      dailyDate: widget.dailyDate,
                       hardMode: widget.hardMode,
                     ),
                 transitionsBuilder:
@@ -632,7 +728,7 @@ class __FuturisticButtonState extends State<_FuturisticButton>
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      '${widget.letters} LETTERS',
+                                      widget.title ?? '${widget.letters} LETTERS',
                                       style: TextStyle(
                                         fontSize: 18, // <-- FIX WAS 20
                                         fontWeight: FontWeight.w900,

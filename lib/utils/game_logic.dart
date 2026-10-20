@@ -75,18 +75,60 @@ String dateKey(DateTime date) {
   return '${date.year}-$m-$d';
 }
 
-/// Days since the first daily puzzle, counted on the local calendar date.
+/// The first day a daily puzzle exists; puzzle #1.
+final DateTime dailyLaunch = DateTime(2026, 10, 20);
+
+DateTime dayOnly(DateTime date) => DateTime(date.year, date.month, date.day);
+
+/// Puzzle number for a calendar date, counting from [dailyLaunch] as #1.
 int dailyNumber(DateTime date) {
   final day = DateTime.utc(date.year, date.month, date.day);
-  return day.difference(DateTime.utc(2025, 1, 1)).inDays + 1;
+  final launch =
+      DateTime.utc(dailyLaunch.year, dailyLaunch.month, dailyLaunch.day);
+  return day.difference(launch).inDays + 1;
 }
 
-/// Picks the same word for everyone on a given day. The word lists are
-/// alphabetical, so the day number is scrambled before indexing.
-String dailyWord(List<String> words, int length, DateTime date) {
-  final n = dailyNumber(date);
-  final index = (n * 7919 + length * 104729) % words.length;
-  return words[index.abs()];
+/// The word for a calendar date. The daily list is already shuffled and has
+/// no repeats, so each day gets a unique word until the list runs out.
+String dailyWord(List<String> words, DateTime date) {
+  final index = (dailyNumber(date) - 1) % words.length;
+  return words[index < 0 ? index + words.length : index];
+}
+
+/// Whether the daily puzzle for [date] can be played: from launch up to today,
+/// never a future day.
+bool isDailyUnlocked(DateTime date, DateTime now) {
+  final day = dayOnly(date);
+  return !day.isBefore(dayOnly(dailyLaunch)) && !day.isAfter(dayOnly(now));
+}
+
+/// Counts consecutive days ending today (or yesterday, if today's puzzle is
+/// not played yet) found in [playedDays], a set of [dateKey]s.
+int dayStreak(Set<String> playedDays, DateTime now) {
+  var day = dayOnly(now);
+  if (!playedDays.contains(dateKey(day))) {
+    day = DateTime(day.year, day.month, day.day - 1);
+  }
+  var streak = 0;
+  while (playedDays.contains(dateKey(day))) {
+    streak++;
+    day = DateTime(day.year, day.month, day.day - 1);
+  }
+  return streak;
+}
+
+/// Longest run of consecutive days in [playedDays].
+int bestDayStreak(Set<String> playedDays) {
+  final days = playedDays.map(DateTime.parse).toList()..sort();
+  var best = 0, run = 0;
+  DateTime? prev;
+  for (final d in days) {
+    final next = prev == null ? null : DateTime(prev.year, prev.month, prev.day + 1);
+    run = (next != null && dateKey(next) == dateKey(d)) ? run + 1 : 1;
+    if (run > best) best = run;
+    prev = d;
+  }
+  return best;
 }
 
 /// Emoji summary of a finished game, ready to paste into a chat.

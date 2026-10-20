@@ -62,6 +62,7 @@ flutter:
   assets:
     - assets/all_english_words/
     - assets/easy_words_json/
+    - assets/daily_words.json
     - assets/icon.png
 
 flutter_launcher_icons:
