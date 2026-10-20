@@ -81,12 +81,15 @@ class Board extends StatelessWidget {
       ],
     );
 
-    if (!isCurrent) return row;
+    // Every row keeps the same wrapper so its tiles survive becoming
+    // submitted, which is when they flip; only the current row moves.
     return AnimatedBuilder(
       animation: shake,
       builder: (context, child) => Transform.translate(
         offset: Offset(
-          math.sin(shake.value * math.pi * 6) * 8 * (1 - shake.value),
+          isCurrent
+              ? math.sin(shake.value * math.pi * 6) * 8 * (1 - shake.value)
+              : 0,
           0,
         ),
         child: child,
@@ -145,7 +148,9 @@ class _TileState extends State<Tile> with TickerProviderStateMixin {
     if (old.letter.isEmpty &&
         widget.letter.isNotEmpty &&
         widget.state == null) {
-      _pop.forward(from: 0).then((_) => _pop.reverse());
+      _pop.forward(from: 0).then((_) {
+        if (mounted) _pop.reverse();
+      });
     }
     if (old.state == null && widget.state != null) {
       Future.delayed(widget.revealDelay, () {

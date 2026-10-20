@@ -88,33 +88,11 @@ class _HomeScreenState extends State<HomeScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        title: const _Logo(),
-        actions: [
-          IconButton(
-            tooltip: 'How to play',
-            icon: const Icon(Icons.help_outline_rounded),
-            onPressed: () => showHelpSheet(context),
-          ),
-          IconButton(
-            tooltip: 'Statistics',
-            icon: const Icon(Icons.leaderboard_rounded),
-            onPressed: () => showStatsSheet(context),
-          ),
-          IconButton(
-            tooltip: 'Settings',
-            icon: const Icon(Icons.settings_rounded),
-            onPressed: () => showSettingsSheet(context),
-          ),
-          const SizedBox(width: 4),
-        ],
-      ),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: _load,
           child: ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
             children: [
               Center(
                 child: ConstrainedBox(
@@ -122,6 +100,32 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      // Header sits in the same centred column as the content
+                      SizedBox(
+                        height: 56,
+                        child: Row(
+                          children: [
+                            const _Logo(),
+                            const Spacer(),
+                            IconButton(
+                              tooltip: 'How to play',
+                              icon: const Icon(Icons.help_outline_rounded),
+                              onPressed: () => showHelpSheet(context),
+                            ),
+                            IconButton(
+                              tooltip: 'Statistics',
+                              icon: const Icon(Icons.leaderboard_rounded),
+                              onPressed: () => showStatsSheet(context),
+                            ),
+                            IconButton(
+                              tooltip: 'Settings',
+                              icon: const Icon(Icons.settings_rounded),
+                              onPressed: () => showSettingsSheet(context),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
                       Row(
                         children: [
                           Expanded(

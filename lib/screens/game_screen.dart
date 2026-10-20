@@ -49,8 +49,8 @@ class _GameScreenState extends State<GameScreen>
     _game
       ..onMessage = _showToast
       ..onInvalid = _shakeRow
-        ..onFinished = _onFinished
-        ..start();
+      ..onFinished = _onFinished
+      ..start();
   }
 
   @override
