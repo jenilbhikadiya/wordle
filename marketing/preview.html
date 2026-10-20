@@ -1,0 +1,257 @@
+<title>Wordle 50-Day Social Kit</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&display=swap">
+<style>
+  /* Layout: a 50-day strip on top, then the day's reel and post side by side like two phones on a desk. */
+  :root {
+    --bg: #F4F5F8; --surface: #FFFFFF; --surface2: #ECEEF3; --fg: #1B1D22; --muted: #5F6470;
+    --line: #DDE0E6; --accent: #4F5BD5; --on-accent: #FFFFFF;
+    --correct: #2F9E66; --present: #D6A419; --absent: #7C818A;
+    --font: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --bg: #0F1013; --surface: #1B1D22; --surface2: #23262C; --fg: #F1F2F4; --muted: #A2A7B1;
+    --line: #2E3138; --accent: #8C95F0; --on-accent: #14172E;
+    --correct: #34A86E; --present: #C99A1A; --absent: #4A4F58; color-scheme: dark;
+  } }
+  :root[data-theme="dark"] {
+    --bg: #0F1013; --surface: #1B1D22; --surface2: #23262C; --fg: #F1F2F4; --muted: #A2A7B1;
+    --line: #2E3138; --accent: #8C95F0; --on-accent: #14172E;
+    --correct: #34A86E; --present: #C99A1A; --absent: #4A4F58; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 15px; line-height: 1.5;
+    padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 24px 48px;
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; display: grid; gap: 22px; }
+  header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px; }
+  .brand { display: flex; gap: 4px; margin-bottom: 8px; }
+  .brand span { width: 26px; height: 26px; border-radius: 5px; display: grid; place-items: center; color: #fff; font-weight: 900; font-size: 14px; }
+  h1 { margin: 0; font-size: clamp(26px, 4vw, 36px); font-weight: 900; letter-spacing: -0.02em; text-wrap: balance; }
+  .lede { margin: 4px 0 0; color: var(--muted); max-width: 62ch; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--muted); }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+
+  .strip { display: grid; grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)); gap: 6px; }
+  .day {
+    appearance: none; border: 1px solid var(--line); background: var(--surface); color: var(--fg);
+    border-radius: 10px; padding: 6px 0 7px; font: inherit; cursor: pointer; display: grid; gap: 1px; text-align: center;
+    position: relative;
+  }
+  .day b { font-size: 17px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .day small { font-size: 10.5px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+  .day::after { content: ""; position: absolute; left: 10px; right: 10px; bottom: 3px; height: 3px; border-radius: 2px; background: var(--k); }
+  .day[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .day[aria-pressed="true"] small { color: var(--on-accent); opacity: .8; }
+  .day:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+  .dayhead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; }
+  .dayhead h2 { margin: 0; font-size: 24px; font-weight: 900; letter-spacing: -0.01em; }
+  .dayhead span { color: var(--muted); font-weight: 600; }
+  .stage { display: grid; grid-template-columns: minmax(0, 0.82fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+  @media (max-width: 820px) { .stage { grid-template-columns: minmax(0, 1fr); } }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px; display: grid; gap: 14px; min-width: 0; }
+  .panel h3 { margin: 0; font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+  .panel h3 em { font-style: normal; color: var(--fg); letter-spacing: 0; text-transform: none; font-size: 14px; }
+  .screen { position: relative; border-radius: 22px; overflow: hidden; background: #000; margin: 0 auto; width: 100%; box-shadow: 0 12px 40px rgba(0,0,0,.18); }
+  .screen.reel { max-width: 340px; aspect-ratio: 9 / 16; }
+  .screen.post { max-width: 440px; aspect-ratio: 4 / 5; border-radius: 14px; }
+  .screen canvas { width: 100%; height: 100%; display: block; }
+  .controls { display: flex; align-items: center; gap: 10px; }
+  .controls input[type=range] { flex: 1; min-width: 0; accent-color: var(--accent); }
+  .controls output { font-variant-numeric: tabular-nums; font-size: 13px; color: var(--muted); min-width: 64px; text-align: right; }
+  .btn {
+    appearance: none; border: 0; border-radius: 999px; background: var(--accent); color: var(--on-accent);
+    font: inherit; font-weight: 800; padding: 8px 16px; cursor: pointer;
+  }
+  .btn.ghost { background: var(--surface2); color: var(--fg); }
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tabs button { appearance: none; border: 1px solid var(--line); background: transparent; color: var(--fg); border-radius: 999px; padding: 6px 12px; font: inherit; font-weight: 700; font-size: 13px; cursor: pointer; }
+  .tabs button[aria-selected="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+  .caption { background: var(--surface2); border-radius: 12px; padding: 12px 14px; white-space: pre-wrap; font-size: 14px; overflow-wrap: anywhere; max-height: 220px; overflow: auto; }
+  .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .sticker { font-size: 13px; color: var(--muted); }
+  .sticker b { color: var(--fg); }
+  .files { font-size: 13px; color: var(--muted); }
+  .files code { background: var(--surface2); padding: 1px 6px; border-radius: 6px; color: var(--fg); }
+
+  .try { border: 1px dashed var(--line); border-radius: 14px; padding: 12px 14px; display: grid; gap: 10px; }
+  .try[hidden] { display: none; }
+  .try p { margin: 0; font-weight: 700; }
+  .try form { display: flex; gap: 8px; flex-wrap: wrap; }
+  .try input { flex: 1; min-width: 0; font: inherit; font-weight: 800; letter-spacing: .3em; text-transform: uppercase; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); }
+  .tiles { display: flex; gap: 5px; }
+  .tiles span { width: 36px; height: 36px; border-radius: 6px; display: grid; place-items: center; color: #fff; font-weight: 900; }
+  .verdict { font-size: 14px; color: var(--muted); }
+  @media (prefers-reduced-motion: reduce) { .screen { box-shadow: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="brand" aria-hidden="true"></div>
+      <h1>50 days of reels and posts</h1>
+      <p class="lede">Daily #1 to #50, 20 Oct to 8 Dec 2026. Each day has one 9:16 reel and one 4:5 post with a two-slide carousel. Pick a day to watch it live, copy captions, and try the puzzles. The finished MP4s and PNGs sit in the project folder.</p>
+    </div>
+    <div class="legend" id="legend"></div>
+  </header>
+
+  <nav class="strip" id="strip" aria-label="Pick a day"></nav>
+
+  <div class="dayhead"><h2 id="dayTitle"></h2><span id="daySub"></span></div>
+
+  <div class="stage">
+    <section class="panel" aria-labelledby="reelH">
+      <h3 id="reelH">Reel <em id="reelType"></em></h3>
+      <div class="screen reel"><canvas id="reelCanvas" width="1080" height="1920" aria-label="Animated reel preview"></canvas></div>
+      <div class="controls">
+        <button class="btn" id="reelPlay" type="button">Pause</button>
+        <input type="range" id="reelSeek" min="0" max="1000" value="0" aria-label="Seek reel">
+        <output id="reelTime">0.0s</output>
+      </div>
+      <div class="row"><span class="sticker" id="reelSticker"></span><button class="btn ghost" type="button" data-copy="reel">Copy caption</button></div>
+      <div class="caption" id="reelCaption"></div>
+      <div class="try" id="reelTry" hidden></div>
+      <div class="files" id="reelFiles"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="postH">
+      <h3 id="postH">Post <em id="postType"></em></h3>
+      <div class="tabs" role="tablist" aria-label="Post view">
+        <button role="tab" type="button" data-view="anim" aria-selected="true">Animated</button>
+        <button role="tab" type="button" data-view="0" aria-selected="false">Slide 1</button>
+        <button role="tab" type="button" data-view="1" aria-selected="false">Slide 2</button>
+      </div>
+      <div class="screen post"><canvas id="postCanvas" width="1080" height="1350" aria-label="Post preview"></canvas></div>
+      <div class="row"><span class="sticker" id="postSticker"></span><button class="btn ghost" type="button" data-copy="post">Copy caption</button></div>
+      <div class="caption" id="postCaption"></div>
+      <div class="try" id="postTry" hidden></div>
+      <div class="files" id="postFiles"></div>
+    </section>
+  </div>
+</div>
+
+<script>/*ENGINE*/</script>
+<script>
+const DAYS = /*DAYS*/;
+const REEL = { launch: ['Launch', '--accent'], hint: ['Today’s hint', '--present'], replay: ['Yesterday replay', '--correct'],
+  pause: ['Pause & solve', '--accent'], tip: ['Pro tip', '--absent'], feature: ['App feature', '--muted'], finale: ['Day 50 finale', '--correct'] };
+const POST = { teaser: 'Teaser + hint ladder', guess: 'Guess the word', recap: 'Yesterday’s answer', fill: 'Fill the gaps', poll: 'Poll' };
+const $ = (id) => document.getElementById(id);
+const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+document.querySelector('.brand').innerHTML = 'WORDLE'.split('').map((c, i) =>
+  `<span style="background:var(${['--correct', '--present', '--absent', '--correct', '--present', '--correct'][i]})">${c}</span>`).join('');
+$('legend').innerHTML = Object.entries(REEL).filter(([k]) => !['launch', 'finale'].includes(k))
+  .map(([, [n, c]]) => `<span><i style="background:var(${c})"></i>${n}</span>`).join('');
+
+let day = null, reelScene = null, postScene = null, postView = 'anim';
+let playing = true, reelT = 0, postT = 0, last = performance.now();
+const rctx = $('reelCanvas').getContext('2d');
+const pctx = $('postCanvas').getContext('2d');
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+$('strip').innerHTML = DAYS.map((d) => `<button class="day" type="button" data-day="${d.day}" aria-pressed="false"
+  style="--k:var(${REEL[d.reel.type][1]})" title="${REEL[d.reel.type][0]} + ${POST[d.post.type]}">
+  <b>${d.day}</b><small>${d.dateLabel.split(' ').slice(1).join(' ')}</small></button>`).join('');
+$('strip').addEventListener('click', (e) => { const b = e.target.closest('.day'); if (b) select(+b.dataset.day); });
+
+function select(n) {
+  day = DAYS[n - 1];
+  document.querySelectorAll('.day').forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset.day === n)));
+  try { localStorage.setItem('kit-day', String(n)); } catch (e) {}
+  reelScene = WordleSocial.reel(day);
+  postScene = WordleSocial.post(day);
+  reelT = reduce ? reelScene.dur - 1 : 0; postT = reduce ? postScene.still : 0;
+  $('dayTitle').textContent = `Daily #${day.day}`;
+  $('daySub').textContent = `${day.dateLabel} 2026  ·  ${day.length}-letter answer`;
+  $('reelType').textContent = `${REEL[day.reel.type][0]}  ·  ${reelScene.dur.toFixed(0)}s`;
+  $('postType').textContent = POST[day.post.type];
+  $('reelCaption').textContent = day.reelCaption;
+  $('postCaption').textContent = day.postCaption;
+  $('reelSticker').innerHTML = `<b>Story:</b> ${esc(day.reelSticker)}`;
+  $('postSticker').innerHTML = `<b>Story:</b> ${esc(day.postSticker)}`;
+  const dir = `social/day-${String(n).padStart(2, '0')}/`;
+  $('reelFiles').innerHTML = `Files: <code>${dir}reel.mp4</code> <code>reel-cover.jpg</code> <code>captions.txt</code>`;
+  $('postFiles').innerHTML = `Files: <code>${dir}post.mp4</code> <code>post-slide-1.png</code> <code>post-slide-2.png</code>`;
+  puzzle($('reelTry'), day.reel.type === 'pause' ? { answer: day.reel.answer, clue: day.reel.clue, label: 'Solve the reel’s puzzle before the countdown' } : null);
+  const pp = day.post;
+  puzzle($('postTry'), pp.answer ? { answer: pp.answer, clue: pp.clue, label: pp.type === 'fill' ? `Fill the gaps: ${pp.pattern.toUpperCase().split('').join(' ')}` : 'Guess the post’s word' } : null);
+  playing = !reduce; $('reelPlay').textContent = playing ? 'Pause' : 'Play';
+}
+
+function esc(s) { return s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c])); }
+
+// Wordle scoring for the try-it boxes.
+function score(g, a) {
+  const res = Array(g.length).fill('absent'); const left = {};
+  [...g].forEach((c, i) => { if (c !== a[i]) left[a[i]] = (left[a[i]] || 0) + 1; });
+  [...g].forEach((c, i) => { if (c === a[i]) res[i] = 'correct'; });
+  [...g].forEach((c, i) => { if (res[i] !== 'correct' && left[c] > 0) { res[i] = 'present'; left[c]--; } });
+  return res;
+}
+function puzzle(box, p) {
+  box.hidden = !p;
+  if (!p) return;
+  const id = box.id + 'In';
+  box.innerHTML = `<p>${esc(p.label)}</p><span class="verdict">Clue: ${esc(p.clue)}. ${p.answer.length} letters.</span>
+    <form><input id="${id}" maxlength="${p.answer.length}" autocomplete="off" aria-label="Your guess"><button class="btn" type="submit">Check</button></form>
+    <div class="tiles" aria-live="polite"></div><span class="verdict" aria-live="polite"></span>`;
+  let tries = 0;
+  box.querySelector('form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const g = $(id).value.toLowerCase().replace(/[^a-z]/g, '');
+    const v = box.querySelectorAll('.verdict')[1];
+    if (g.length !== p.answer.length) { v.textContent = `Type ${p.answer.length} letters.`; return; }
+    tries++;
+    const st = score(g, p.answer);
+    box.querySelector('.tiles').innerHTML = st.map((s, i) => `<span style="background:var(--${s})">${g[i].toUpperCase()}</span>`).join('');
+    v.textContent = g === p.answer ? `Got it in ${tries}! Nice.` : tries >= 3 ? `It was ${p.answer.toUpperCase()}.` : 'Not quite. Try again.';
+  });
+}
+
+$('reelPlay').addEventListener('click', () => { playing = !playing; $('reelPlay').textContent = playing ? 'Pause' : 'Play'; });
+$('reelSeek').addEventListener('input', (e) => { reelT = (e.target.value / 1000) * reelScene.dur; });
+document.querySelectorAll('[role=tab]').forEach((b) => b.addEventListener('click', () => {
+  postView = b.dataset.view; postT = 0;
+  document.querySelectorAll('[role=tab]').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
+}));
+document.querySelectorAll('[data-copy]').forEach((b) => b.addEventListener('click', () => {
+  const txt = b.dataset.copy === 'reel' ? day.reelCaption : day.postCaption;
+  const done = () => { b.textContent = 'Copied'; setTimeout(() => (b.textContent = 'Copy caption'), 1400); };
+  navigator.clipboard.writeText(txt).then(done).catch(() => {
+    const r = document.createRange(); r.selectNodeContents($(b.dataset.copy + 'Caption'));
+    const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = 'Selected, press copy';
+  });
+}));
+
+function frame(now) {
+  const dt = Math.min(0.1, (now - last) / 1000); last = now;
+  if (reelScene) {
+    if (playing) reelT = (reelT + dt) % reelScene.dur;
+    rctx.setTransform(1, 0, 0, 1, 0, 0); rctx.globalAlpha = 1;
+    reelScene.draw(rctx, reelT);
+    $('reelSeek').value = Math.round((reelT / reelScene.dur) * 1000);
+    $('reelTime').value = `${reelT.toFixed(1)} / ${reelScene.dur.toFixed(0)}s`;
+  }
+  if (postScene) {
+    if (playing) postT += dt;
+    pctx.setTransform(1, 0, 0, 1, 0, 0); pctx.globalAlpha = 1;
+    if (postView === 'anim') postScene.draw(pctx, postT % postScene.dur);
+    else postScene.slides[+postView](pctx, Math.min(postT, 8));
+  }
+  requestAnimationFrame(frame);
+}
+
+let start = 1;
+try { start = +localStorage.getItem('kit-day') || 1; } catch (e) {}
+const hash = location.hash.match(/^#day(\d+)$/);
+if (hash) start = +hash[1];
+Promise.race([document.fonts.load('800 40px Inter'), new Promise((r) => setTimeout(r, 1500))]).then(() => {
+  select(Math.min(50, Math.max(1, start)));
+  requestAnimationFrame(frame);
+});
+</script>

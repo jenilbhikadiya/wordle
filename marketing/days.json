@@ -1,0 +1,2268 @@
+[
+ {
+  "day": 1,
+  "date": "2026-10-20",
+  "dateLabel": "Tue 20 Oct",
+  "length": 6,
+  "clue": "Leads a flock, but not of sheep",
+  "vowels": 2,
+  "word": "pastor",
+  "prev": null,
+  "reel": {
+   "type": "launch"
+  },
+  "post": {
+   "type": "teaser"
+  }
+ },
+ {
+  "day": 2,
+  "date": "2026-10-21",
+  "dateLabel": "Wed 21 Oct",
+  "length": 5,
+  "clue": "A ___ for your thoughts",
+  "vowels": 1,
+  "word": "penny",
+  "prev": "pastor",
+  "reel": {
+   "type": "replay",
+   "guesses": [
+    {
+     "word": "planet",
+     "states": [
+      "correct",
+      "absent",
+      "present",
+      "absent",
+      "absent",
+      "present"
+     ]
+    },
+    {
+     "word": "potato",
+     "states": [
+      "correct",
+      "present",
+      "present",
+      "present",
+      "absent",
+      "absent"
+     ]
+    },
+    {
+     "word": "pastor",
+     "states": [
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    }
+   ]
+  },
+  "post": {
+   "type": "guess",
+   "answer": "cocoa",
+   "guesses": [
+    {
+     "word": "trace",
+     "states": [
+      "absent",
+      "absent",
+      "present",
+      "present",
+      "absent"
+     ]
+    },
+    {
+     "word": "magic",
+     "states": [
+      "absent",
+      "present",
+      "absent",
+      "absent",
+      "present"
+     ]
+    },
+    {
+     "word": "local",
+     "states": [
+      "absent",
+      "correct",
+      "correct",
+      "present",
+      "absent"
+     ]
+    }
+   ],
+   "clue": "Hot drink, or what chocolate starts as"
+  }
+ },
+ {
+  "day": 3,
+  "date": "2026-10-22",
+  "dateLabel": "Thu 22 Oct",
+  "length": 5,
+  "clue": "Found on shelves and on trading floors",
+  "vowels": 1,
+  "word": "stock",
+  "prev": "penny",
+  "reel": {
+   "type": "pause",
+   "answer": "vivid",
+   "clue": "Bright and full of colour",
+   "guesses": [
+    {
+     "word": "stare",
+     "states": [
+      "absent",
+      "absent",
+      "absent",
+      "absent",
+      "absent"
+     ]
+    },
+    {
+     "word": "imply",
+     "states": [
+      "present",
+      "absent",
+      "absent",
+      "absent",
+      "absent"
+     ]
+    },
+    {
+     "word": "union",
+     "states": [
+      "absent",
+      "absent",
+      "present",
+      "absent",
+      "absent"
+     ]
+    },
+    {
+     "word": "vivid",
+     "states": [
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    }
+   ]
+  },
+  "post": {
+   "type": "recap",
+   "clue": "A ___ for your thoughts"
+  }
+ },
+ {
+  "day": 4,
+  "date": "2026-10-23",
+  "dateLabel": "Fri 23 Oct",
+  "length": 4,
+  "clue": "Got out of bed, or grew thorns",
+  "vowels": 2,
+  "word": "rose",
+  "prev": "stock",
+  "reel": {
+   "type": "tip",
+   "tip": {
+    "title": "Open with vowels",
+    "body": "A starter like ARISE tests three vowels in one go.",
+    "demo": [
+     "arise:paapc",
+     "ocean:apcpa"
+    ]
+   }
+  },
+  "post": {
+   "type": "fill",
+   "answer": "yacht",
+   "pattern": "___ht",
+   "clue": "A fancy boat with sails"
+  }
+ },
+ {
+  "day": 5,
+  "date": "2026-10-24",
+  "dateLabel": "Sat 24 Oct",
+  "length": 4,
+  "clue": "Where the cash goes, or what farmers do to soil",
+  "vowels": 1,
+  "word": "till",
+  "prev": "rose",
+  "reel": {
+   "type": "feature",
+   "feature": {
+    "title": "Day streak",
+    "body": "Play each daily puzzle on its day and watch the flame grow.",
+    "icon": "flame"
+   }
+  },
+  "post": {
+   "type": "poll",
+   "poll": {
+    "q": "What's your go-to starter word?",
+    "opts": [
+     "CRANE",
+     "ADIEU",
+     "SLATE",
+     "AUDIO"
+    ]
+   }
+  }
+ },
+ {
+  "day": 6,
+  "date": "2026-10-25",
+  "dateLabel": "Sun 25 Oct",
+  "length": 4,
+  "clue": "Giraffes have this covered",
+  "vowels": 1,
+  "word": "tall",
+  "prev": "till",
+  "reel": {
+   "type": "hint"
+  },
+  "post": {
+   "type": "teaser"
+  }
+ },
+ {
+  "day": 7,
+  "date": "2026-10-26",
+  "dateLabel": "Mon 26 Oct",
+  "length": 5,
+  "clue": "Yours ___, at the end of a letter",
+  "vowels": 1,
+  "word": "truly",
+  "prev": "tall",
+  "reel": {
+   "type": "replay",
+   "guesses": [
+    {
+     "word": "sore",
+     "states": [
+      "absent",
+      "absent",
+      "absent",
+      "absent"
+     ]
+    },
+    {
+     "word": "pill",
+     "states": [
+      "absent",
+      "absent",
+      "correct",
+      "correct"
+     ]
+    },
+    {
+     "word": "hall",
+     "states": [
+      "absent",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    },
+    {
+     "word": "mall",
+     "states": [
+      "absent",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    },
+    {
+     "word": "tall",
+     "states": [
+      "correct",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    }
+   ]
+  },
+  "post": {
+   "type": "guess",
+   "answer": "tulip",
+   "guesses": [
+    {
+     "word": "crane",
+     "states": [
+      "absent",
+      "absent",
+      "absent",
+      "absent",
+      "absent"
+     ]
+    },
+    {
+     "word": "study",
+     "states": [
+      "absent",
+      "present",
+      "present",
+      "absent",
+      "absent"
+     ]
+    },
+    {
+     "word": "ought",
+     "states": [
+      "absent",
+      "correct",
+      "absent",
+      "absent",
+      "present"
+     ]
+    }
+   ],
+   "clue": "Spring flower of the Netherlands"
+  }
+ },
+ {
+  "day": 8,
+  "date": "2026-10-27",
+  "dateLabel": "Tue 27 Oct",
+  "length": 6,
+  "clue": "What lightning did to the tree",
+  "vowels": 1,
+  "word": "struck",
+  "prev": "truly",
+  "reel": {
+   "type": "pause",
+   "answer": "quilt",
+   "clue": "Patchwork that keeps you warm",
+   "guesses": [
+    {
+     "word": "stare",
+     "states": [
+      "absent",
+      "present",
+      "absent",
+      "absent",
+      "absent"
+     ]
+    },
+    {
+     "word": "month",
+     "states": [
+      "absent",
+      "absent",
+      "absent",
+      "present",
+      "absent"
+     ]
+    },
+    {
+     "word": "built",
+     "states": [
+      "absent",
+      "correct",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    },
+    {
+     "word": "quilt",
+     "states": [
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    }
+   ]
+  },
+  "post": {
+   "type": "recap",
+   "clue": "Yours ___, at the end of a letter"
+  }
+ },
+ {
+  "day": 9,
+  "date": "2026-10-28",
+  "dateLabel": "Wed 28 Oct",
+  "length": 6,
+  "clue": "Happens once every trip around the sun",
+  "vowels": 3,
+  "word": "annual",
+  "prev": "struck",
+  "reel": {
+   "type": "tip",
+   "tip": {
+    "title": "Grey means gone",
+    "body": "Never reuse a grey letter. Every guess should learn something new.",
+    "demo": [
+     "crane:aaaaa",
+     "moist:apaca"
+    ]
+   }
+  },
+  "post": {
+   "type": "fill",
+   "answer": "glove",
+   "pattern": "___ve",
+   "clue": "A hand's best friend in winter"
+  }
+ },
+ {
+  "day": 10,
+  "date": "2026-10-29",
+  "dateLabel": "Thu 29 Oct",
+  "length": 5,
+  "clue": "Not smooth, and golfers dread it",
+  "vowels": 2,
+  "word": "rough",
+  "prev": "annual",
+  "reel": {
+   "type": "feature",
+   "feature": {
+    "title": "Calendar",
+    "body": "Missed a day? Catch up from the calendar any time.",
+    "icon": "calendar"
+   }
+  },
+  "post": {
+   "type": "poll",
+   "poll": {
+    "q": "Which length do you like best?",
+    "opts": [
+     "4 letters",
+     "5 letters",
+     "6 letters",
+     "Surprise me"
+    ]
+   }
+  }
+ },
+ {
+  "day": 11,
+  "date": "2026-10-30",
+  "dateLabel": "Fri 30 Oct",
+  "length": 6,
+  "clue": "It can't wait until tomorrow",
+  "vowels": 2,
+  "word": "urgent",
+  "prev": "rough",
+  "reel": {
+   "type": "hint"
+  },
+  "post": {
+   "type": "teaser"
+  }
+ },
+ {
+  "day": 12,
+  "date": "2026-10-31",
+  "dateLabel": "Sat 31 Oct",
+  "length": 6,
+  "clue": "The opposite of old-fashioned",
+  "vowels": 2,
+  "word": "modern",
+  "prev": "urgent",
+  "reel": {
+   "type": "replay",
+   "guesses": [
+    {
+     "word": "stored",
+     "states": [
+      "absent",
+      "present",
+      "absent",
+      "present",
+      "present",
+      "absent"
+     ]
+    },
+    {
+     "word": "permit",
+     "states": [
+      "absent",
+      "present",
+      "present",
+      "absent",
+      "absent",
+      "correct"
+     ]
+    },
+    {
+     "word": "urgent",
+     "states": [
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    }
+   ]
+  },
+  "post": {
+   "type": "guess",
+   "answer": "salsa",
+   "guesses": [
+    {
+     "word": "crane",
+     "states": [
+      "absent",
+      "absent",
+      "present",
+      "absent",
+      "absent"
+     ]
+    },
+    {
+     "word": "admit",
+     "states": [
+      "present",
+      "absent",
+      "absent",
+      "absent",
+      "absent"
+     ]
+    },
+    {
+     "word": "happy",
+     "states": [
+      "absent",
+      "correct",
+      "absent",
+      "absent",
+      "absent"
+     ]
+    }
+   ],
+   "clue": "A dip, or a dance"
+  }
+ },
+ {
+  "day": 13,
+  "date": "2026-11-01",
+  "dateLabel": "Sun 1 Nov",
+  "length": 6,
+  "clue": "What you did on the dotted line",
+  "vowels": 2,
+  "word": "signed",
+  "prev": "modern",
+  "reel": {
+   "type": "pause",
+   "answer": "maple",
+   "clue": "Gives syrup and red leaves",
+   "guesses": [
+    {
+     "word": "stare",
+     "states": [
+      "absent",
+      "absent",
+      "present",
+      "absent",
+      "correct"
+     ]
+    },
+    {
+     "word": "dance",
+     "states": [
+      "absent",
+      "correct",
+      "absent",
+      "absent",
+      "correct"
+     ]
+    },
+    {
+     "word": "value",
+     "states": [
+      "absent",
+      "correct",
+      "present",
+      "absent",
+      "correct"
+     ]
+    },
+    {
+     "word": "maple",
+     "states": [
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    }
+   ]
+  },
+  "post": {
+   "type": "recap",
+   "clue": "The opposite of old-fashioned"
+  }
+ },
+ {
+  "day": 14,
+  "date": "2026-11-02",
+  "dateLabel": "Mon 2 Nov",
+  "length": 4,
+  "clue": "A drummer keeps it, a champion does it",
+  "vowels": 2,
+  "word": "beat",
+  "prev": "signed",
+  "reel": {
+   "type": "tip",
+   "tip": {
+    "title": "Yellow means move it",
+    "body": "The letter is in the word, just not in that spot.",
+    "demo": [
+     "stale:ppppa",
+     "least:ccccc"
+    ]
+   }
+  },
+  "post": {
+   "type": "fill",
+   "answer": "kayak",
+   "pattern": "__ya_",
+   "clue": "A boat that reads the same backwards"
+  }
+ },
+ {
+  "day": 15,
+  "date": "2026-11-03",
+  "dateLabel": "Tue 3 Nov",
+  "length": 4,
+  "clue": "You can read one, or reserve a table with one",
+  "vowels": 2,
+  "word": "book",
+  "prev": "beat",
+  "reel": {
+   "type": "feature",
+   "feature": {
+    "title": "Practice mode",
+    "body": "Unlimited 4, 5 or 6 letter words. Pick a length and go.",
+    "icon": "practice"
+   }
+  },
+  "post": {
+   "type": "poll",
+   "poll": {
+    "q": "Hard mode: yes or no?",
+    "opts": [
+     "Always on",
+     "Sometimes",
+     "Never",
+     "What's hard mode?"
+    ]
+   }
+  }
+ },
+ {
+  "day": 16,
+  "date": "2026-11-04",
+  "dateLabel": "Wed 4 Nov",
+  "length": 6,
+  "clue": "Something you hold without proof",
+  "vowels": 3,
+  "word": "belief",
+  "prev": "book",
+  "reel": {
+   "type": "hint"
+  },
+  "post": {
+   "type": "teaser"
+  }
+ },
+ {
+  "day": 17,
+  "date": "2026-11-05",
+  "dateLabel": "Thu 5 Nov",
+  "length": 5,
+  "clue": "Duly ___: message received",
+  "vowels": 2,
+  "word": "noted",
+  "prev": "belief",
+  "reel": {
+   "type": "replay",
+   "guesses": [
+    {
+     "word": "senior",
+     "states": [
+      "absent",
+      "correct",
+      "absent",
+      "correct",
+      "absent",
+      "absent"
+     ]
+    },
+    {
+     "word": "medium",
+     "states": [
+      "absent",
+      "correct",
+      "absent",
+      "correct",
+      "absent",
+      "absent"
+     ]
+    },
+    {
+     "word": "belief",
+     "states": [
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    }
+   ]
+  },
+  "post": {
+   "type": "guess",
+   "answer": "waltz",
+   "guesses": [
+    {
+     "word": "trace",
+     "states": [
+      "present",
+      "absent",
+      "present",
+      "absent",
+      "absent"
+     ]
+    },
+    {
+     "word": "about",
+     "states": [
+      "present",
+      "absent",
+      "absent",
+      "absent",
+      "present"
+     ]
+    },
+    {
+     "word": "vital",
+     "states": [
+      "absent",
+      "absent",
+      "present",
+      "present",
+      "present"
+     ]
+    }
+   ],
+   "clue": "A dance in three-four time"
+  }
+ },
+ {
+  "day": 18,
+  "date": "2026-11-06",
+  "dateLabel": "Fri 6 Nov",
+  "length": 4,
+  "clue": "Look after a garden, or lean a certain way",
+  "vowels": 1,
+  "word": "tend",
+  "prev": "noted",
+  "reel": {
+   "type": "pause",
+   "answer": "otter",
+   "clue": "Holds hands while it sleeps",
+   "guesses": [
+    {
+     "word": "slate",
+     "states": [
+      "absent",
+      "absent",
+      "absent",
+      "present",
+      "present"
+     ]
+    },
+    {
+     "word": "quiet",
+     "states": [
+      "absent",
+      "absent",
+      "absent",
+      "correct",
+      "present"
+     ]
+    },
+    {
+     "word": "threw",
+     "states": [
+      "present",
+      "absent",
+      "present",
+      "correct",
+      "absent"
+     ]
+    },
+    {
+     "word": "enter",
+     "states": [
+      "absent",
+      "absent",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    },
+    {
+     "word": "otter",
+     "states": [
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    }
+   ]
+  },
+  "post": {
+   "type": "recap",
+   "clue": "Duly ___: message received"
+  }
+ },
+ {
+  "day": 19,
+  "date": "2026-11-07",
+  "dateLabel": "Sat 7 Nov",
+  "length": 4,
+  "clue": "Carries water, or plays a Highland tune",
+  "vowels": 2,
+  "word": "pipe",
+  "prev": "tend",
+  "reel": {
+   "type": "tip",
+   "tip": {
+    "title": "Watch for doubles",
+    "body": "Letters can repeat. Words like BALLOT and COFFEE are fair game.",
+    "demo": [
+     "ballot:accaca",
+     "coffee:cccccc"
+    ]
+   }
+  },
+  "post": {
+   "type": "fill",
+   "answer": "donut",
+   "pattern": "__nu_",
+   "clue": "Fried ring with sprinkles"
+  }
+ },
+ {
+  "day": 20,
+  "date": "2026-11-08",
+  "dateLabel": "Sun 8 Nov",
+  "length": 5,
+  "clue": "A logo is the face of one",
+  "vowels": 1,
+  "word": "brand",
+  "prev": "pipe",
+  "reel": {
+   "type": "feature",
+   "feature": {
+    "title": "Light and dark",
+    "body": "Two themes, easy on the eyes at any hour.",
+    "icon": "theme"
+   }
+  },
+  "post": {
+   "type": "poll",
+   "poll": {
+    "q": "How many guesses did today take you?",
+    "opts": [
+     "1-2",
+     "3",
+     "4",
+     "5-6"
+    ]
+   }
+  }
+ },
+ {
+  "day": 21,
+  "date": "2026-11-09",
+  "dateLabel": "Mon 9 Nov",
+  "length": 6,
+  "clue": "They answer 911 and 999",
+  "vowels": 3,
+  "word": "police",
+  "prev": "brand",
+  "reel": {
+   "type": "hint"
+  },
+  "post": {
+   "type": "teaser"
+  }
+ },
+ {
+  "day": 22,
+  "date": "2026-11-10",
+  "dateLabel": "Tue 10 Nov",
+  "length": 6,
+  "clue": "Streets are lined with them",
+  "vowels": 3,
+  "word": "houses",
+  "prev": "police",
+  "reel": {
+   "type": "replay",
+   "guesses": [
+    {
+     "word": "planet",
+     "states": [
+      "correct",
+      "present",
+      "absent",
+      "absent",
+      "present",
+      "absent"
+     ]
+    },
+    {
+     "word": "people",
+     "states": [
+      "correct",
+      "absent",
+      "present",
+      "absent",
+      "present",
+      "correct"
+     ]
+    },
+    {
+     "word": "police",
+     "states": [
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    }
+   ]
+  },
+  "post": {
+   "type": "guess",
+   "answer": "crisp",
+   "guesses": [
+    {
+     "word": "trace",
+     "states": [
+      "absent",
+      "correct",
+      "absent",
+      "present",
+      "absent"
+     ]
+    },
+    {
+     "word": "cross",
+     "states": [
+      "correct",
+      "correct",
+      "absent",
+      "correct",
+      "absent"
+     ]
+    }
+   ],
+   "clue": "Fresh lettuce, or a cold morning"
+  }
+ },
+ {
+  "day": 23,
+  "date": "2026-11-11",
+  "dateLabel": "Wed 11 Nov",
+  "length": 5,
+  "clue": "Can be dark, or Trojan",
+  "vowels": 2,
+  "word": "horse",
+  "prev": "houses",
+  "reel": {
+   "type": "pause",
+   "answer": "raven",
+   "clue": "A black bird with a famous poem",
+   "guesses": [
+    {
+     "word": "arise",
+     "states": [
+      "present",
+      "present",
+      "absent",
+      "absent",
+      "present"
+     ]
+    },
+    {
+     "word": "heart",
+     "states": [
+      "absent",
+      "present",
+      "present",
+      "present",
+      "absent"
+     ]
+    },
+    {
+     "word": "eager",
+     "states": [
+      "absent",
+      "correct",
+      "absent",
+      "correct",
+      "present"
+     ]
+    },
+    {
+     "word": "raven",
+     "states": [
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    }
+   ]
+  },
+  "post": {
+   "type": "recap",
+   "clue": "Streets are lined with them"
+  }
+ },
+ {
+  "day": 24,
+  "date": "2026-11-12",
+  "dateLabel": "Thu 12 Nov",
+  "length": 5,
+  "clue": "Wants and ___",
+  "vowels": 2,
+  "word": "needs",
+  "prev": "horse",
+  "reel": {
+   "type": "tip",
+   "tip": {
+    "title": "Count the tiles",
+    "body": "The daily word can be 4, 5 or 6 letters. Check before you type.",
+    "demo": [
+     "word:aaaa",
+     "words:aaaaa",
+     "worded:aaaaaa"
+    ]
+   }
+  },
+  "post": {
+   "type": "fill",
+   "answer": "jolly",
+   "pattern": "jo___",
+   "clue": "Cheerful, like a certain Roger"
+  }
+ },
+ {
+  "day": 25,
+  "date": "2026-11-13",
+  "dateLabel": "Fri 13 Nov",
+  "length": 5,
+  "clue": "Works the night shift on the ward",
+  "vowels": 2,
+  "word": "nurse",
+  "prev": "needs",
+  "reel": {
+   "type": "feature",
+   "feature": {
+    "title": "Share your grid",
+    "body": "Copy an emoji grid of your result, no spoilers.",
+    "icon": "share"
+   }
+  },
+  "post": {
+   "type": "poll",
+   "poll": {
+    "q": "When do you play?",
+    "opts": [
+     "Right at midnight",
+     "Morning coffee",
+     "Lunch break",
+     "Before bed"
+    ]
+   }
+  }
+ },
+ {
+  "day": 26,
+  "date": "2026-11-14",
+  "dateLabel": "Sat 14 Nov",
+  "length": 5,
+  "clue": "Stretch for the top shelf",
+  "vowels": 2,
+  "word": "reach",
+  "prev": "nurse",
+  "reel": {
+   "type": "hint"
+  },
+  "post": {
+   "type": "teaser"
+  }
+ },
+ {
+  "day": 27,
+  "date": "2026-11-15",
+  "dateLabel": "Sun 15 Nov",
+  "length": 4,
+  "clue": "The reason keys exist",
+  "vowels": 1,
+  "word": "lock",
+  "prev": "reach",
+  "reel": {
+   "type": "replay",
+   "guesses": [
+    {
+     "word": "slate",
+     "states": [
+      "absent",
+      "absent",
+      "correct",
+      "absent",
+      "present"
+     ]
+    },
+    {
+     "word": "beach",
+     "states": [
+      "absent",
+      "correct",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    },
+    {
+     "word": "reach",
+     "states": [
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    }
+   ]
+  },
+  "post": {
+   "type": "guess",
+   "answer": "grape",
+   "guesses": [
+    {
+     "word": "slate",
+     "states": [
+      "absent",
+      "absent",
+      "correct",
+      "absent",
+      "correct"
+     ]
+    },
+    {
+     "word": "brave",
+     "states": [
+      "absent",
+      "correct",
+      "correct",
+      "absent",
+      "correct"
+     ]
+    },
+    {
+     "word": "frame",
+     "states": [
+      "absent",
+      "correct",
+      "correct",
+      "absent",
+      "correct"
+     ]
+    }
+   ],
+   "clue": "Comes in bunches, becomes wine"
+  }
+ },
+ {
+  "day": 28,
+  "date": "2026-11-16",
+  "dateLabel": "Mon 16 Nov",
+  "length": 6,
+  "clue": "Not a single person",
+  "vowels": 2,
+  "word": "nobody",
+  "prev": "lock",
+  "reel": {
+   "type": "pause",
+   "answer": "dwarf",
+   "clue": "Tiny star, or one of seven",
+   "guesses": [
+    {
+     "word": "stare",
+     "states": [
+      "absent",
+      "absent",
+      "correct",
+      "correct",
+      "absent"
+     ]
+    },
+    {
+     "word": "alarm",
+     "states": [
+      "absent",
+      "absent",
+      "correct",
+      "correct",
+      "absent"
+     ]
+    },
+    {
+     "word": "guard",
+     "states": [
+      "absent",
+      "absent",
+      "correct",
+      "correct",
+      "present"
+     ]
+    },
+    {
+     "word": "dwarf",
+     "states": [
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    }
+   ]
+  },
+  "post": {
+   "type": "recap",
+   "clue": "The reason keys exist"
+  }
+ },
+ {
+  "day": 29,
+  "date": "2026-11-17",
+  "dateLabel": "Tue 17 Nov",
+  "length": 5,
+  "clue": "Count a spider's legs",
+  "vowels": 2,
+  "word": "eight",
+  "prev": "nobody",
+  "reel": {
+   "type": "tip",
+   "tip": {
+    "title": "Think in endings",
+    "body": "-ER, -ED and -LY turn up a lot in longer words.",
+    "demo": [
+     "paper:aaacc",
+     "rested:aaaacc",
+     "lately:aaaacc"
+    ]
+   }
+  },
+  "post": {
+   "type": "fill",
+   "answer": "bloom",
+   "pattern": "b__o_",
+   "clue": "What flowers do in spring"
+  }
+ },
+ {
+  "day": 30,
+  "date": "2026-11-18",
+  "dateLabel": "Wed 18 Nov",
+  "length": 5,
+  "clue": "Very fast, like white water",
+  "vowels": 2,
+  "word": "rapid",
+  "prev": "eight",
+  "reel": {
+   "type": "feature",
+   "feature": {
+    "title": "Stats",
+    "body": "Win %, streaks and guess distribution for every length.",
+    "icon": "stats"
+   }
+  },
+  "post": {
+   "type": "poll",
+   "poll": {
+    "q": "Which letter scares you most?",
+    "opts": [
+     "Q",
+     "X",
+     "Z",
+     "J"
+    ]
+   }
+  }
+ },
+ {
+  "day": 31,
+  "date": "2026-11-19",
+  "dateLabel": "Thu 19 Nov",
+  "length": 6,
+  "clue": "Describes coffee and weightlifters",
+  "vowels": 1,
+  "word": "strong",
+  "prev": "rapid",
+  "reel": {
+   "type": "hint"
+  },
+  "post": {
+   "type": "teaser"
+  }
+ },
+ {
+  "day": 32,
+  "date": "2026-11-20",
+  "dateLabel": "Fri 20 Nov",
+  "length": 4,
+  "clue": "Every story needs one",
+  "vowels": 2,
+  "word": "hero",
+  "prev": "strong",
+  "reel": {
+   "type": "replay",
+   "guesses": [
+    {
+     "word": "planet",
+     "states": [
+      "absent",
+      "absent",
+      "absent",
+      "present",
+      "absent",
+      "present"
+     ]
+    },
+    {
+     "word": "cotton",
+     "states": [
+      "absent",
+      "present",
+      "present",
+      "absent",
+      "absent",
+      "present"
+     ]
+    },
+    {
+     "word": "strong",
+     "states": [
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    }
+   ]
+  },
+  "post": {
+   "type": "guess",
+   "answer": "whale",
+   "guesses": [
+    {
+     "word": "stare",
+     "states": [
+      "absent",
+      "absent",
+      "correct",
+      "absent",
+      "correct"
+     ]
+    },
+    {
+     "word": "plane",
+     "states": [
+      "absent",
+      "present",
+      "correct",
+      "absent",
+      "correct"
+     ]
+    },
+    {
+     "word": "leave",
+     "states": [
+      "present",
+      "absent",
+      "correct",
+      "absent",
+      "correct"
+     ]
+    }
+   ],
+   "clue": "The biggest animal in the sea"
+  }
+ },
+ {
+  "day": 33,
+  "date": "2026-11-21",
+  "dateLabel": "Sat 21 Nov",
+  "length": 6,
+  "clue": "Refuse to take no for an answer",
+  "vowels": 2,
+  "word": "insist",
+  "prev": "hero",
+  "reel": {
+   "type": "pause",
+   "answer": "daisy",
+   "clue": "Fresh as one, says the saying",
+   "guesses": [
+    {
+     "word": "crane",
+     "states": [
+      "absent",
+      "absent",
+      "present",
+      "absent",
+      "absent"
+     ]
+    },
+    {
+     "word": "happy",
+     "states": [
+      "absent",
+      "correct",
+      "absent",
+      "absent",
+      "correct"
+     ]
+    },
+    {
+     "word": "daily",
+     "states": [
+      "correct",
+      "correct",
+      "correct",
+      "absent",
+      "correct"
+     ]
+    },
+    {
+     "word": "daisy",
+     "states": [
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    }
+   ]
+  },
+  "post": {
+   "type": "recap",
+   "clue": "Every story needs one"
+  }
+ },
+ {
+  "day": 34,
+  "date": "2026-11-22",
+  "dateLabel": "Sun 22 Nov",
+  "length": 4,
+  "clue": "A hand, fully closed",
+  "vowels": 1,
+  "word": "fist",
+  "prev": "insist",
+  "reel": {
+   "type": "tip",
+   "tip": {
+    "title": "Spend hints wisely",
+    "body": "Hints cost points, so save them for when you're truly stuck.",
+    "demo": [
+     "hints:aaaaa"
+    ]
+   }
+  },
+  "post": {
+   "type": "fill",
+   "answer": "panda",
+   "pattern": "_a_d_",
+   "clue": "Black, white and full of bamboo"
+  }
+ },
+ {
+  "day": 35,
+  "date": "2026-11-23",
+  "dateLabel": "Mon 23 Nov",
+  "length": 6,
+  "clue": "Keep it and don't tell",
+  "vowels": 2,
+  "word": "secret",
+  "prev": "fist",
+  "reel": {
+   "type": "feature",
+   "feature": {
+    "title": "Hints",
+    "body": "Reveal a letter, up to two per game.",
+    "icon": "hint"
+   }
+  },
+  "post": {
+   "type": "poll",
+   "poll": {
+    "q": "What's your current streak?",
+    "opts": [
+     "0-2 days",
+     "3-9 days",
+     "10-29 days",
+     "30+ days"
+    ]
+   }
+  }
+ },
+ {
+  "day": 36,
+  "date": "2026-11-24",
+  "dateLabel": "Tue 24 Nov",
+  "length": 6,
+  "clue": "Hard on the wallet",
+  "vowels": 1,
+  "word": "costly",
+  "prev": "secret",
+  "reel": {
+   "type": "hint"
+  },
+  "post": {
+   "type": "teaser"
+  }
+ },
+ {
+  "day": 37,
+  "date": "2026-11-25",
+  "dateLabel": "Wed 25 Nov",
+  "length": 4,
+  "clue": "Happily ___ after",
+  "vowels": 2,
+  "word": "ever",
+  "prev": "costly",
+  "reel": {
+   "type": "replay",
+   "guesses": [
+    {
+     "word": "planet",
+     "states": [
+      "absent",
+      "present",
+      "absent",
+      "absent",
+      "absent",
+      "present"
+     ]
+    },
+    {
+     "word": "mostly",
+     "states": [
+      "absent",
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    },
+    {
+     "word": "costly",
+     "states": [
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    }
+   ]
+  },
+  "post": {
+   "type": "guess",
+   "answer": "fudge",
+   "guesses": [
+    {
+     "word": "slate",
+     "states": [
+      "absent",
+      "absent",
+      "absent",
+      "absent",
+      "correct"
+     ]
+    },
+    {
+     "word": "pride",
+     "states": [
+      "absent",
+      "absent",
+      "absent",
+      "present",
+      "correct"
+     ]
+    },
+    {
+     "word": "judge",
+     "states": [
+      "absent",
+      "correct",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    }
+   ],
+   "clue": "A sweet treat, or a dodge"
+  }
+ },
+ {
+  "day": 38,
+  "date": "2026-11-26",
+  "dateLabel": "Thu 26 Nov",
+  "length": 4,
+  "clue": "Fine, or where water is drawn from",
+  "vowels": 1,
+  "word": "well",
+  "prev": "ever",
+  "reel": {
+   "type": "pause",
+   "answer": "scarf",
+   "clue": "Wrap it round your neck",
+   "guesses": [
+    {
+     "word": "arise",
+     "states": [
+      "present",
+      "present",
+      "absent",
+      "present",
+      "absent"
+     ]
+    },
+    {
+     "word": "smart",
+     "states": [
+      "correct",
+      "absent",
+      "correct",
+      "correct",
+      "absent"
+     ]
+    },
+    {
+     "word": "sharp",
+     "states": [
+      "correct",
+      "absent",
+      "correct",
+      "correct",
+      "absent"
+     ]
+    },
+    {
+     "word": "scarf",
+     "states": [
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    }
+   ]
+  },
+  "post": {
+   "type": "recap",
+   "clue": "Happily ___ after"
+  }
+ },
+ {
+  "day": 39,
+  "date": "2026-11-27",
+  "dateLabel": "Fri 27 Nov",
+  "length": 4,
+  "clue": "Seven of them make a week",
+  "vowels": 1,
+  "word": "days",
+  "prev": "well",
+  "reel": {
+   "type": "tip",
+   "tip": {
+    "title": "Try hard mode",
+    "body": "Every letter you find must be reused. Wins earn bonus points.",
+    "demo": [
+     "brave:apaac",
+     "grade:acccc"
+    ]
+   }
+  },
+  "post": {
+   "type": "fill",
+   "answer": "igloo",
+   "pattern": "ig___",
+   "clue": "A house made of snow"
+  }
+ },
+ {
+  "day": 40,
+  "date": "2026-11-28",
+  "dateLabel": "Sat 28 Nov",
+  "length": 5,
+  "clue": "A surprise win, or an unhappy feeling",
+  "vowels": 2,
+  "word": "upset",
+  "prev": "days",
+  "reel": {
+   "type": "feature",
+   "feature": {
+    "title": "Hard mode",
+    "body": "Found letters must be reused. Bonus points per win.",
+    "icon": "hard"
+   }
+  },
+  "post": {
+   "type": "poll",
+   "poll": {
+    "q": "Do you ever use hints?",
+    "opts": [
+     "Never",
+     "Only to save a streak",
+     "Sometimes",
+     "Every game"
+    ]
+   }
+  }
+ },
+ {
+  "day": 41,
+  "date": "2026-11-29",
+  "dateLabel": "Sun 29 Nov",
+  "length": 6,
+  "clue": "You solve one every single day",
+  "vowels": 2,
+  "word": "puzzle",
+  "prev": "upset",
+  "reel": {
+   "type": "hint"
+  },
+  "post": {
+   "type": "teaser"
+  }
+ },
+ {
+  "day": 42,
+  "date": "2026-11-30",
+  "dateLabel": "Mon 30 Nov",
+  "length": 4,
+  "clue": "A message that buzzes your phone",
+  "vowels": 1,
+  "word": "text",
+  "prev": "puzzle",
+  "reel": {
+   "type": "replay",
+   "guesses": [
+    {
+     "word": "senior",
+     "states": [
+      "absent",
+      "present",
+      "absent",
+      "absent",
+      "absent",
+      "absent"
+     ]
+    },
+    {
+     "word": "packed",
+     "states": [
+      "correct",
+      "absent",
+      "absent",
+      "absent",
+      "present",
+      "absent"
+     ]
+    },
+    {
+     "word": "puzzle",
+     "states": [
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    }
+   ]
+  },
+  "post": {
+   "type": "guess",
+   "answer": "zebra",
+   "guesses": [
+    {
+     "word": "crane",
+     "states": [
+      "absent",
+      "present",
+      "present",
+      "absent",
+      "present"
+     ]
+    },
+    {
+     "word": "early",
+     "states": [
+      "present",
+      "present",
+      "present",
+      "absent",
+      "absent"
+     ]
+    },
+    {
+     "word": "after",
+     "states": [
+      "present",
+      "absent",
+      "absent",
+      "present",
+      "present"
+     ]
+    }
+   ],
+   "clue": "Stripes on four legs"
+  }
+ },
+ {
+  "day": 43,
+  "date": "2026-12-01",
+  "dateLabel": "Tue 1 Dec",
+  "length": 5,
+  "clue": "Held in a courtroom, or a free version",
+  "vowels": 2,
+  "word": "trial",
+  "prev": "text",
+  "reel": {
+   "type": "pause",
+   "answer": "hippo",
+   "clue": "Big river animal with a big yawn",
+   "guesses": [
+    {
+     "word": "stare",
+     "states": [
+      "absent",
+      "absent",
+      "absent",
+      "absent",
+      "absent"
+     ]
+    },
+    {
+     "word": "clock",
+     "states": [
+      "absent",
+      "absent",
+      "present",
+      "absent",
+      "absent"
+     ]
+    },
+    {
+     "word": "going",
+     "states": [
+      "absent",
+      "present",
+      "present",
+      "absent",
+      "absent"
+     ]
+    },
+    {
+     "word": "hippo",
+     "states": [
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    }
+   ]
+  },
+  "post": {
+   "type": "recap",
+   "clue": "A message that buzzes your phone"
+  }
+ },
+ {
+  "day": 44,
+  "date": "2026-12-02",
+  "dateLabel": "Wed 2 Dec",
+  "length": 6,
+  "clue": "Pick from the options",
+  "vowels": 2,
+  "word": "select",
+  "prev": "trial",
+  "reel": {
+   "type": "tip",
+   "tip": {
+    "title": "Guess to learn",
+    "body": "Stuck between MIGHT, FIGHT and LIGHT? Play a word that tests M, F and L at once.",
+    "demo": [
+     "night:acccc",
+     "film:aaaa"
+    ]
+   }
+  },
+  "post": {
+   "type": "fill",
+   "answer": "unzip",
+   "pattern": "u_z__",
+   "clue": "Open a jacket, or a file"
+  }
+ },
+ {
+  "day": 45,
+  "date": "2026-12-03",
+  "dateLabel": "Thu 3 Dec",
+  "length": 5,
+  "clue": "How you feel after a 2/6",
+  "vowels": 2,
+  "word": "proud",
+  "prev": "select",
+  "reel": {
+   "type": "feature",
+   "feature": {
+    "title": "New at midnight",
+    "body": "A fresh puzzle unlocks every night, the same for everyone.",
+    "icon": "clock"
+   }
+  },
+  "post": {
+   "type": "poll",
+   "poll": {
+    "q": "Light mode or dark mode?",
+    "opts": [
+     "Light",
+     "Dark",
+     "Follows my phone",
+     "I switch it up"
+    ]
+   }
+  }
+ },
+ {
+  "day": 46,
+  "date": "2026-12-04",
+  "dateLabel": "Fri 4 Dec",
+  "length": 6,
+  "clue": "A warning of danger",
+  "vowels": 2,
+  "word": "threat",
+  "prev": "proud",
+  "reel": {
+   "type": "hint"
+  },
+  "post": {
+   "type": "teaser"
+  }
+ },
+ {
+  "day": 47,
+  "date": "2026-12-05",
+  "dateLabel": "Sat 5 Dec",
+  "length": 4,
+  "clue": "The way out",
+  "vowels": 2,
+  "word": "exit",
+  "prev": "threat",
+  "reel": {
+   "type": "replay",
+   "guesses": [
+    {
+     "word": "carton",
+     "states": [
+      "absent",
+      "present",
+      "correct",
+      "present",
+      "absent",
+      "absent"
+     ]
+    },
+    {
+     "word": "stream",
+     "states": [
+      "absent",
+      "present",
+      "correct",
+      "correct",
+      "correct",
+      "absent"
+     ]
+    },
+    {
+     "word": "thread",
+     "states": [
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "absent"
+     ]
+    },
+    {
+     "word": "threat",
+     "states": [
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    }
+   ]
+  },
+  "post": {
+   "type": "guess",
+   "answer": "koala",
+   "guesses": [
+    {
+     "word": "trace",
+     "states": [
+      "absent",
+      "absent",
+      "correct",
+      "absent",
+      "absent"
+     ]
+    },
+    {
+     "word": "plain",
+     "states": [
+      "absent",
+      "present",
+      "correct",
+      "absent",
+      "absent"
+     ]
+    },
+    {
+     "word": "shall",
+     "states": [
+      "absent",
+      "absent",
+      "correct",
+      "correct",
+      "absent"
+     ]
+    }
+   ],
+   "clue": "Australian tree hugger"
+  }
+ },
+ {
+  "day": 48,
+  "date": "2026-12-06",
+  "dateLabel": "Sun 6 Dec",
+  "length": 6,
+  "clue": "Where old things go on display",
+  "vowels": 3,
+  "word": "museum",
+  "prev": "exit",
+  "reel": {
+   "type": "pause",
+   "answer": "bagel",
+   "clue": "Bread with a hole",
+   "guesses": [
+    {
+     "word": "slate",
+     "states": [
+      "absent",
+      "present",
+      "present",
+      "absent",
+      "present"
+     ]
+    },
+    {
+     "word": "ideal",
+     "states": [
+      "absent",
+      "absent",
+      "present",
+      "present",
+      "correct"
+     ]
+    },
+    {
+     "word": "panel",
+     "states": [
+      "absent",
+      "correct",
+      "absent",
+      "correct",
+      "correct"
+     ]
+    },
+    {
+     "word": "label",
+     "states": [
+      "absent",
+      "correct",
+      "present",
+      "correct",
+      "correct"
+     ]
+    },
+    {
+     "word": "bagel",
+     "states": [
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    }
+   ]
+  },
+  "post": {
+   "type": "recap",
+   "clue": "The way out"
+  }
+ },
+ {
+  "day": 49,
+  "date": "2026-12-07",
+  "dateLabel": "Mon 7 Dec",
+  "length": 6,
+  "clue": "Mix red and blue",
+  "vowels": 2,
+  "word": "purple",
+  "prev": "museum",
+  "reel": {
+   "type": "tip",
+   "tip": {
+    "title": "Play every day",
+    "body": "Your streak only grows on the day itself. Don't break the chain.",
+    "demo": [
+     "daily:ccccc"
+    ]
+   }
+  },
+  "post": {
+   "type": "fill",
+   "answer": "gecko",
+   "pattern": "__ck_",
+   "clue": "Little lizard that climbs walls"
+  }
+ },
+ {
+  "day": 50,
+  "date": "2026-12-08",
+  "dateLabel": "Tue 8 Dec",
+  "length": 6,
+  "clue": "Bring something hidden to light",
+  "vowels": 3,
+  "word": "expose",
+  "prev": "purple",
+  "reel": {
+   "type": "finale",
+   "past": [
+    "pastor",
+    "penny",
+    "stock",
+    "rose",
+    "till",
+    "tall",
+    "truly",
+    "struck",
+    "annual",
+    "rough",
+    "urgent",
+    "modern",
+    "signed",
+    "beat",
+    "book",
+    "belief",
+    "noted",
+    "tend",
+    "pipe",
+    "brand",
+    "police",
+    "houses",
+    "horse",
+    "needs",
+    "nurse",
+    "reach",
+    "lock",
+    "nobody",
+    "eight",
+    "rapid",
+    "strong",
+    "hero",
+    "insist",
+    "fist",
+    "secret",
+    "costly",
+    "ever",
+    "well",
+    "days",
+    "upset",
+    "puzzle",
+    "text",
+    "trial",
+    "select",
+    "proud",
+    "threat",
+    "exit",
+    "museum",
+    "purple"
+   ]
+  },
+  "post": {
+   "type": "poll",
+   "poll": {
+    "q": "Who do you share results with?",
+    "opts": [
+     "Group chat",
+     "Family",
+     "Social media",
+     "Nobody, I'm a lone wolf"
+    ]
+   }
+  }
+ }
+]
