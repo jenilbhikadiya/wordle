@@ -1,0 +1,76 @@
+[
+ {
+  "pin": 1,
+  "type": "welcome",
+  "title": "Welcome to Daily Wordle"
+ },
+ {
+  "pin": 2,
+  "type": "howto",
+  "title": "How to play in 20 seconds",
+  "guesses": [
+   {
+    "word": "stare",
+    "states": [
+     "absent",
+     "absent",
+     "present",
+     "absent",
+     "present"
+    ]
+   },
+   {
+    "word": "ahead",
+    "states": [
+     "present",
+     "absent",
+     "present",
+     "absent",
+     "absent"
+    ]
+   },
+   {
+    "word": "label",
+    "states": [
+     "absent",
+     "correct",
+     "absent",
+     "correct",
+     "correct"
+    ]
+   },
+   {
+    "word": "camel",
+    "states": [
+     "correct",
+     "correct",
+     "correct",
+     "correct",
+     "correct"
+    ]
+   }
+  ]
+ },
+ {
+  "pin": 3,
+  "type": "challenge",
+  "title": "The 3-word challenge",
+  "rounds": [
+   {
+    "answer": "bison",
+    "clue": "Shaggy giant of the prairie",
+    "pattern": "___on"
+   },
+   {
+    "answer": "moose",
+    "clue": "Antlered giant of the north",
+    "pattern": "__os_"
+   },
+   {
+    "answer": "comet",
+    "clue": "Icy visitor with a glowing tail",
+    "pattern": "___et"
+   }
+  ]
+ }
+]
