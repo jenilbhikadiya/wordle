@@ -11,10 +11,12 @@ const only = (process.argv.find((a) => a.startsWith('--only=')) || '').slice(7);
 const workers = +((process.argv.find((a) => a.startsWith('--workers=')) || '').slice(10) || 3);
 const [lo, hi] = range.split('-').map(Number);
 const days = JSON.parse(fs.readFileSync(path.join(__dirname, 'days.json'), 'utf8'));
+const pins = JSON.parse(fs.readFileSync(path.join(__dirname, 'pinned.json'), 'utf8'));
 const engine = fs.readFileSync(path.join(__dirname, 'engine.js'), 'utf8');
 
 const jobs = [];
-for (const d of days) {
+if (process.argv.includes('--pins')) for (const d of pins) jobs.push({ kind: 'pin', d });
+else for (const d of days) {
   if (d.day < lo || d.day > (hi || lo)) continue;
   if (only !== 'post') jobs.push({ kind: 'reel', d });
   if (only !== 'reel') jobs.push({ kind: 'post', d });
@@ -28,7 +30,8 @@ function ffmpeg(args) {
 
 async function setup(page, job) {
   return page.evaluate(([kind, d]) => {
-    const s = kind === 'reel' ? WordleSocial.reel(d) : WordleSocial.post(d);
+    const make = { reel: WordleSocial.reel, post: WordleSocial.post, pin: WordleSocial.pin, cover: WordleSocial.pinCover };
+    const s = make[kind](d);
     window.__s = s;
     const c = document.getElementById('c');
     c.width = s.w;
@@ -48,10 +51,17 @@ const grab = (page, fn, arg, type = 'image/jpeg') => page.evaluate(([fn, arg, ty
 }, [fn, arg, type]);
 
 async function run(page, job) {
-  const dir = path.join(outDir, `day-${String(job.d.day).padStart(2, '0')}`);
+  const dir = job.kind === 'pin'
+    ? path.join(outDir, 'pinned', `pin-${job.d.pin}-${job.d.type}`)
+    : path.join(outDir, `day-${String(job.d.day).padStart(2, '0')}`);
   fs.mkdirSync(dir, { recursive: true });
+  if (job.kind === 'pin') {
+    await setup(page, { kind: 'cover', d: job.d });
+    const png = await grab(page, 'frame', 0, 'image/png');
+    fs.writeFileSync(path.join(dir, 'cover.png'), Buffer.from(png, 'base64'));
+  }
   const info = await setup(page, job);
-  const base = path.join(dir, job.kind);
+  const base = path.join(dir, job.kind === 'pin' ? 'reel' : job.kind);
   fs.writeFileSync(base + '.events.json', JSON.stringify({ dur: info.dur, events: info.events }));
   const silent = base + '.silent.mp4';
   const ff = ffmpeg(['-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-',

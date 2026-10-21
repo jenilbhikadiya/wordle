@@ -14,7 +14,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 ASSETS = ROOT / "assets"
 OUT = Path(__file__).resolve().parent / "days.json"
-DAYS = 50
+DAYS = 60
+# Day 50 closes the first run with a recap of every answer so far.
+FINALE = 50
+# Fixed so that adding days never reshuffles the content already made.
+SOON = 80
 
 LENGTH_FILES = {4: "four_name_word.json", 5: "five_name_word.json", 6: "six_name_word.json"}
 
@@ -69,6 +73,16 @@ CLUES = {
     "museum": "Where old things go on display",
     "purple": "Mix red and blue",
     "expose": "Bring something hidden to light",
+    "very": "Adds extra emphasis, ___ much",
+    "leaves": "Fall off trees in autumn",
+    "letter": "Comes in the post, or the alphabet",
+    "defend": "What a goalkeeper does",
+    "find": "Lost and ___",
+    "grip": "Hold on tight",
+    "lady": "A gentleman's counterpart",
+    "reason": "The why behind it all",
+    "grand": "Piano, canyon or a thousand dollars",
+    "soft": "Like a pillow or a whisper",
 }
 
 # Each demo row is "word:states", with c = right spot, p = wrong spot, a = absent.
@@ -83,6 +97,8 @@ TIPS = [
     {"title": "Try hard mode", "body": "Every letter you find must be reused. Wins earn bonus points.", "demo": ["brave:apaac", "grade:acccc"]},
     {"title": "Guess to learn", "body": "Stuck between MIGHT, FIGHT and LIGHT? Play a word that tests M, F and L at once.", "demo": ["night:acccc", "film:aaaa"]},
     {"title": "Play every day", "body": "Your streak only grows on the day itself. Don't break the chain.", "demo": ["daily:ccccc"]},
+    {"title": "Mind the Y", "body": "Out of vowels? Y often steps in, as in LYRIC or GYPSY.", "demo": ["lyric:acaaa", "shyly:aacaa"]},
+    {"title": "Missed one? Catch up", "body": "Past days wait in the calendar. Play them any time.", "demo": ["catch:ccccc"]},
 ]
 
 FEATURES = [
@@ -109,12 +125,16 @@ POLLS = [
     {"q": "Do you ever use hints?", "opts": ["Never", "Only to save a streak", "Sometimes", "Every game"]},
     {"q": "Light mode or dark mode?", "opts": ["Light", "Dark", "Follows my phone", "I switch it up"]},
     {"q": "Who do you share results with?", "opts": ["Group chat", "Family", "Social media", "Nobody, I'm a lone wolf"]},
+    {"q": "Best feeling in the game?", "opts": ["A 2/6 win", "Saving a 6/6", "A long streak", "Beating a friend"]},
+    {"q": "60 days in! How's your streak?", "opts": ["Still going", "Broke it once", "Starting over", "Just found you"]},
 ]
 
 # Fun, familiar answers for guess-along puzzles. None are daily words.
 PRACTICE = """bloom crisp dwarf grape jolly kayak mango ninja quilt salsa vivid waltz
 yacht zebra daisy fudge glove hippo igloo koala llama maple otter panda raven
 scarf tulip unzip viper whale bagel cocoa donut gecko""".split()
+# Added for days 51-60; kept separate so the first list's shuffle is unchanged.
+PRACTICE_MORE = "lemur sushi bison camel moose comet pixel crumb swirl latte".split()
 
 PRACTICE_CLUES = {
     "bloom": "What flowers do in spring", "crisp": "Fresh lettuce, or a cold morning",
@@ -134,6 +154,11 @@ PRACTICE_CLUES = {
     "viper": "A snake with a bite", "whale": "The biggest animal in the sea",
     "bagel": "Bread with a hole", "cocoa": "Hot drink, or what chocolate starts as",
     "donut": "Fried ring with sprinkles", "gecko": "Little lizard that climbs walls",
+    "lemur": "Big-eyed climber from Madagascar", "sushi": "Rice and fish, rolled up",
+    "bison": "Shaggy giant of the prairie", "camel": "Ship of the desert",
+    "moose": "Antlered giant of the north", "comet": "Icy visitor with a glowing tail",
+    "pixel": "One tiny dot on your screen", "crumb": "What's left on the plate",
+    "swirl": "Twist in a soft-serve cone", "latte": "Coffee with lots of milk",
 }
 
 STARTERS = {4: ["rate", "tale", "near", "sore", "mail"],
@@ -194,7 +219,7 @@ def main():
     daily_words = {d["word"] for d in daily}
     # Guess paths draw on common words; the daily list drops the proper nouns.
     # Words due soon are left out so a wrong guess never hints at a coming day.
-    soon = {d["word"] for d in daily[: DAYS + 30]}
+    soon = {d["word"] for d in daily[:SOON]}
     easy = {n: [w for w in load(f"easy_words_json/{f}") if w in daily_words and w not in soon]
             for n, f in LENGTH_FILES.items()}
     rng = random.Random(2026)
@@ -202,6 +227,7 @@ def main():
     allowed = set(load("all_english_words/five_name_word.json"))
     practice = [w for w in PRACTICE if w not in daily_words and w in allowed]
     rng.shuffle(practice)
+    practice += [w for w in PRACTICE_MORE if w not in daily_words and w in allowed]
     practice_iter = iter(practice)
 
     days = []
@@ -214,7 +240,7 @@ def main():
         post = POST_CYCLE[n % 5]
         if n == 1:
             reel = "launch"
-        if n == DAYS:
+        if n == FINALE:
             reel = "finale"
         item = {
             "day": n,
@@ -240,7 +266,8 @@ def main():
         if reel == "tip":
             r["tip"] = TIPS[(n // 5) % len(TIPS)]
         if reel == "feature":
-            r["feature"] = FEATURES[(n // 5 - 1) % len(FEATURES)]
+            # Day 50 is the finale, so later days shift back one to use every feature.
+            r["feature"] = FEATURES[(n // 5 - (1 if n < FINALE else 2)) % len(FEATURES)]
         if reel == "finale":
             r["past"] = [x["word"] for x in daily[: n - 1]]
 
@@ -262,6 +289,21 @@ def main():
         days.append(item)
 
     OUT.write_text(json.dumps(days, indent=1))
+
+    # Three evergreen reels to pin at the top of the profile.
+    prng = random.Random(7)
+    howto = solve("camel", easy[5], prng, lo=4, hi=4)
+    rounds = []
+    for w in ["bison", "moose", "comet"]:
+        k = sorted(prng.sample(range(5), 2))
+        rounds.append({"answer": w, "clue": PRACTICE_CLUES[w],
+                       "pattern": "".join(c if i in k else "_" for i, c in enumerate(w))})
+    pins = [
+        {"pin": 1, "type": "welcome", "title": "Welcome to Daily Wordle"},
+        {"pin": 2, "type": "howto", "title": "How to play in 20 seconds", "guesses": howto},
+        {"pin": 3, "type": "challenge", "title": "The 3-word challenge", "rounds": rounds},
+    ]
+    (OUT.parent / "pinned.json").write_text(json.dumps(pins, indent=1))
     print(f"wrote {len(days)} days to {OUT}")
 
 

@@ -141,7 +141,7 @@ def write_wav(path, data):
 
 
 def main(out_dir):
-    for ev in sorted(Path(out_dir).glob("day-*/*.events.json")):
+    for ev in sorted(Path(out_dir).glob("**/*.events.json")):
         base = ev.with_name(ev.name.replace(".events.json", ""))
         silent = base.with_suffix(".silent.mp4")
         final = base.with_suffix(".mp4")

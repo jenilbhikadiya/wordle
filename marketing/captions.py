@@ -92,6 +92,27 @@ def post_caption(d):
     return f"{body}\n\n{TAGS} #day{n}", sticker
 
 
+PIN_CAPTIONS = {
+    "welcome": lambda p: (
+        "👋 New here? Welcome to Daily Wordle!\n\n"
+        "🟩 One new word every day\n🟨 The same puzzle for everyone\n⬛ 4 to 6 letters, 6 tries\n\n"
+        "Follow for daily hints, replays and play-along puzzles. Today's word is waiting 👉 link in bio\n\n"
+        f"{TAGS} #newhere #starthere",
+        "Link sticker to the game + 'New here? Start with this reel'"),
+    "howto": lambda p: (
+        "How to play in 20 seconds ⏱️\n\n"
+        "🟩 Green: right letter, right spot\n🟨 Yellow: right letter, wrong spot\n⬛ Grey: not in the word\n\n"
+        "Save this for later and send it to the friend who keeps asking what the coloured squares are 😄\n\n"
+        f"{TAGS} #howtoplay #tutorial",
+        "Quiz sticker: 'What does yellow mean?' A) Right spot B) Wrong spot C) Not in word"),
+    "challenge": lambda p: (
+        "🎯 THE 3-WORD CHALLENGE\n\n3 words. 3 seconds each. No pausing!\n\n"
+        "Comment your score: 0, 1, 2 or 3 👇\nTag a friend you think can beat you.\n\n"
+        f"{TAGS} #challenge #playalong",
+        "Slider sticker: 'How many did you get?' 0 → 3"),
+}
+
+
 def main(out_dir):
     out = Path(out_dir)
     days = json.loads((HERE / "days.json").read_text())
@@ -116,7 +137,21 @@ def main(out_dir):
         w.writerow(["day", "date", "label", "letters", "reel", "post", "reel caption", "post caption"])
         w.writerows(rows)
     (out / "days.captioned.json").write_text(json.dumps(days))
-    print(f"captions for {len(days)} days")
+
+    pins = json.loads((HERE / "pinned.json").read_text())
+    for p in pins:
+        cap, sticker = PIN_CAPTIONS[p["type"]](p)
+        p["caption"], p["sticker"] = cap, sticker
+        folder = out / "pinned" / f"pin-{p['pin']}-{p['type']}"
+        folder.mkdir(parents=True, exist_ok=True)
+        (folder / "captions.txt").write_text(
+            f"PINNED {p['pin']}/3 · {p['title']}\n"
+            "Pin in this order so the grid reads 1, 2, 3 from the left: pin 3 first, then 2, then 1.\n"
+            "Use cover.png as the reel cover.\n\n"
+            f"=== CAPTION ===\n{cap}\n\nStory: {sticker}\n"
+        )
+    (out / "pinned.captioned.json").write_text(json.dumps(pins))
+    print(f"captions for {len(days)} days and {len(pins)} pinned reels")
 
 
 if __name__ == "__main__":

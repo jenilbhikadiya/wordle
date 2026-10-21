@@ -1292,5 +1292,283 @@
     return { w: ps.w, h: ps.h, dur, events, draw, slides: ps.slides, still: 6 };
   }
 
-  root.WordleSocial = { reel, post, postSlides, PAL };
+  // ---------------------------------------------------------------- pinned
+
+  // Three evergreen reels for the top of the profile, plus their covers.
+  function pin(p) {
+    const W = 1080;
+    const H = 1920;
+    const P = PAL.dark;
+    const cue = cues();
+    const playSub = 'Free to play  ·  link in bio';
+    let dur;
+    let draw;
+    cue.add(0.05, 'whoosh');
+
+    if (p.type === 'welcome') {
+      dur = 21;
+      for (let i = 0; i < 6; i++) cue.add(0.4 + i * 0.09 + 0.2, 'flip');
+      cue.add(1.9, 'whoosh');
+      const legend = [
+        ['crane', ['correct', null, null, null, null], 'Green: right letter, right spot'],
+        ['pilot', [null, null, 'present', null, null], 'Yellow: in the word, wrong spot'],
+        ['vague', [null, null, null, 'absent', null], 'Grey: not in the word'],
+      ].map(([word, states, label], i) => {
+        const tt = 5.0 + i * 1.3;
+        cue.typing(tt, 5, 0.05);
+        cue.add(tt + 0.6 + states.findIndex(Boolean) * 0.08, 'flip');
+        return { word, states, label, tt };
+      });
+      cue.add(10.0, 'whoosh');
+      [10.6, 10.9, 11.2, 11.5].forEach((x) => cue.add(x, 'pop'));
+      cue.add(15.4, 'whoosh');
+      cue.add(16.6, 'pop');
+      cue.add(17.4, 'chime');
+      const cards = [
+        ['Day streak', 'Play daily, grow the flame', 'flame'],
+        ['Calendar', 'Catch up on missed days', 'calendar'],
+        ['Practice', 'Unlimited 4, 5, 6 letters', 'practice'],
+        ['Hard mode', 'Bonus points per win', 'hard'],
+      ];
+      draw = (ctx, t) => {
+        background(ctx, P, t, W, H, 101);
+        const mv = ease.inOut(seg(t, 1.8, 0.8));
+        // Soft halo behind the opening logo.
+        fade(ctx, 1 - mv, () => {
+          const g = ctx.createRadialGradient(540, 760, 0, 540, 760, 520);
+          g.addColorStop(0, hexA(P.primary, 0.35 * seg(t, 0.3, 0.8)));
+          g.addColorStop(1, hexA(P.primary, 0));
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 200, W, 1100);
+        });
+        logo(ctx, P, 540, lerp(760, 190, mv), lerp(140, 74, mv), t, 0.4);
+        pill(ctx, 'START HERE', 540, 300, { k: seg(t, 2.4, 0.4), bg: P.button, color: '#FFFFFF', size: 32 });
+        fade(ctx, 1 - seg(t, 9.6, 0.4), () => {
+          headline(ctx, 'Welcome to Daily Wordle', 540, 470, t, 2.6, { size: 116, lines: 2, color: P.text, accent: ['Daily', 'Wordle'], accentColor: P.primary });
+          para(ctx, 'One new word every day. The same puzzle for everyone.', 540, 760, t, 3.8, { size: 42, color: P.sub, maxW: 820 });
+          legend.forEach((row, i) => {
+            if (t < row.tt - 0.5) return;
+            const y = 980 + i * 200;
+            guessRow(ctx, P, 540, y, 108, 12, row.word, row.states, t, row.tt, row.tt + 0.4, { typeStep: 0.05, flipStep: 0.08 });
+            text(ctx, row.label, 540, y + 86, { size: 34, weight: 700, color: P.sub, alpha: seg(t, row.tt + 0.9, 0.3) });
+          });
+        });
+        fade(ctx, seg(t, 10.0, 0.4) * (1 - seg(t, 15.2, 0.4)), () => {
+          headline(ctx, 'Made for a daily habit', 540, 470, t, 10.0, { size: 100, color: P.text });
+          cards.forEach(([title, body, icon], i) => {
+            const k = ease.back(seg(t, 10.6 + i * 0.3, 0.5));
+            const cx = 540 + (i % 2 ? 230 : -230);
+            const cy = 800 + Math.floor(i / 2) * 420;
+            ctx.save();
+            ctx.translate(cx, cy + Math.sin(t * 2 + i) * 6);
+            ctx.scale(k, k);
+            ctx.globalAlpha *= clamp(k * 2);
+            card(ctx, P, -205, -180, 410, 370);
+            if (icon === 'flame') flame(ctx, 0, -50, 120, P.streak, t);
+            if (icon === 'hard') bolt(ctx, 0, -55, 110, P.present);
+            if (icon === 'calendar') {
+              for (let j = 0; j < 12; j++) {
+                ctx.fillStyle = j < 9 ? P.correct : P.empty;
+                ctx.beginPath();
+                ctx.arc(-75 + (j % 4) * 50, -110 + Math.floor(j / 4) * 50, 18, 0, Math.PI * 2);
+                ctx.fill();
+              }
+            }
+            if (icon === 'practice') {
+              [['4', P.correct], ['5', P.present], ['6', P.button]].forEach(([n, c], j) => {
+                ctx.fillStyle = c;
+                ctx.beginPath();
+                ctx.roundRect(-130 + j * 92, -105, 76, 76, 12);
+                ctx.fill();
+                text(ctx, n, -92 + j * 92, -66, { size: 44, weight: 900, color: '#FFFFFF' });
+              });
+            }
+            text(ctx, title, 0, 70, { size: 44, weight: 800, color: P.text });
+            text(ctx, body, 0, 125, { size: 28, weight: 600, color: P.sub });
+            ctx.restore();
+          });
+        });
+        fade(ctx, seg(t, 15.4, 0.4), () => {
+          headline(ctx, 'Follow for a daily dose', 540, 520, t, 15.4, { size: 104, lines: 2, color: P.text, accent: ['daily'], accentColor: P.correct });
+          ['Hints', 'Replays', 'Puzzles'].forEach((w, i) => {
+            pill(ctx, w, 540 + (i - 1) * 260, 820, { k: seg(t, 16.0 + i * 0.2, 0.4), bg: P.card2, color: P.text, size: 36, spacing: 0, border: P.filled });
+          });
+          const pulse = 1 + 0.05 * Math.sin(t * 6);
+          pill(ctx, '+  FOLLOW', 540, 1000, { k: seg(t, 16.6, 0.4), bg: P.correct, color: '#FFFFFF', size: 48, scale: pulse, shadow: true });
+        });
+        cta(ctx, P, t, 17.4, 540, 1440, 'Play today’s word', playSub);
+      };
+    }
+
+    if (p.type === 'howto') {
+      const s = 112;
+      const sch = schedule(p.guesses, 3.0, cue, { typeStep: 0.09, flipStep: 0.18, pause: 1.6 });
+      const last = sch.rows[sch.rows.length - 1];
+      const tWin = last.tDone + 0.1;
+      cue.add(tWin, 'win');
+      cue.add(tWin + 2.4, 'chime');
+      dur = tWin + 5.5;
+      const notes = [
+        'Type any 5-letter word to start',
+        'Yellow: right letter, wrong spot',
+        'Green: right letter, right spot',
+        'Use every clue to close in',
+      ];
+      draw = (ctx, t) => {
+        background(ctx, P, t, W, H, 102);
+        reelHeader(ctx, P, t, null, 'HOW TO PLAY');
+        headline(ctx, 'How to play in 20 seconds', 540, 430, t, 0.6, { size: 100, lines: 2, color: P.text, accent: ['20', 'seconds'], accentColor: P.present });
+        const top = 680 + s / 2;
+        for (let i = 0; i < 6; i++) {
+          const y = top + i * (s + 12);
+          emptyRow(ctx, P, 540, y, s, 12, 5, { t, t0: 1.6 + i * 0.06 });
+          const row = sch.rows[i];
+          if (row) guessRow(ctx, P, 540, y, s, 12, row.word, row.states, t, row.tType, row.tFlip, { typeStep: 0.09, flipStep: 0.18, tWin: row === last ? tWin : null });
+        }
+        confetti(ctx, P, t, tWin, 540, top + 3 * (s + 12), 120, 21);
+        // The note under the board follows the latest row to land.
+        let idx = 0;
+        sch.rows.forEach((r, i) => { if (t >= r.tDone) idx = i + 1; });
+        const ny = top + 6 * (s + 12) + 30;
+        if (t < tWin + 0.3) {
+          const note = notes[Math.min(idx, notes.length - 1)];
+          const startT = idx === 0 ? 2.4 : sch.rows[idx - 1].tDone;
+          const k = ease.out(seg(t, startT, 0.35));
+          pill(ctx, note, 540, ny, { k, bg: P.card2, color: P.text, size: 36, spacing: 0, border: P.filled });
+        } else {
+          pill(ctx, 'SOLVED IN 4/6', 540, ny, { k: seg(t, tWin + 0.3, 0.4), bg: P.correct, color: '#FFFFFF', size: 40, shadow: true });
+        }
+        cta(ctx, P, t, tWin + 2.4, 540, ny + 140, 'Your turn: play now', null);
+      };
+    }
+
+    if (p.type === 'challenge') {
+      const R = 6.2;
+      const t0 = 3.2;
+      p.rounds.forEach((r, i) => {
+        const b = t0 + i * R;
+        cue.add(b, 'whoosh');
+        for (let j = 0; j < 5; j++) cue.add(b + 0.3 + j * 0.08, 'pop');
+        [0, 1, 2].forEach((j) => cue.add(b + 1.4 + j, 'tick'));
+        cue.add(b + 4.5, 'flip');
+        cue.add(b + 4.7, 'flip');
+        cue.add(b + 5.0, 'win');
+      });
+      const tEnd = t0 + p.rounds.length * R;
+      cue.add(tEnd, 'whoosh');
+      [0, 1, 2, 3].forEach((j) => cue.add(tEnd + 0.8 + j * 0.15, 'pop'));
+      cue.add(tEnd + 2.4, 'chime');
+      dur = tEnd + 6.5;
+      draw = (ctx, t) => {
+        background(ctx, P, t, W, H, 103);
+        reelHeader(ctx, P, t, null, 'PLAY ALONG');
+        fade(ctx, 1 - seg(t, tEnd - 0.2, 0.3), () => {
+          headline(ctx, '3 words. 3 seconds each.', 540, 440, t, 0.5, { size: 96, lines: 2, color: P.text, accent: ['3'], accentColor: P.present });
+          text(ctx, 'Shout the answer before the reveal', 540, 650, { size: 38, weight: 700, color: P.sub, alpha: seg(t, 1.6, 0.4) });
+          p.rounds.forEach((r, i) => {
+            const b = t0 + i * R;
+            if (t < b - 0.5 || t > b + R) return;
+            const inK = ease.out(seg(t, b - 0.5, 0.5));
+            const outK = ease.inOut(seg(t, b + R - 0.4, 0.4));
+            ctx.save();
+            ctx.translate((1 - inK) * W - outK * W, 0);
+            pill(ctx, `ROUND ${i + 1} / ${p.rounds.length}`, 540, 780, { k: 1, bg: P.button, color: '#FFFFFF', size: 32 });
+            const s = 150;
+            const x0 = 540 - rowWidth(5, s, 14) / 2 + s / 2;
+            for (let j = 0; j < 5; j++) {
+              const c = r.pattern[j];
+              const k = ease.back(seg(t, b + 0.3 + j * 0.08, 0.4));
+              if (c !== '_') tile(ctx, P, x0 + j * (s + 14), 990, s, c, 'correct', { scale: k, alpha: clamp(k * 2) });
+              else {
+                const fl = seg(t, b + 4.5 + j * 0.06, 0.4);
+                if (fl > 0) tile(ctx, P, x0 + j * (s + 14), 990, s, r.answer[j], 'present', { flip: fl });
+                else tile(ctx, P, x0 + j * (s + 14), 990, s, '?', null, { scale: k, alpha: clamp(k * 2), letterColor: P.primary, border: hexA(P.primary, 0.5 + 0.5 * Math.sin(t * 6 + j)) });
+              }
+            }
+            text(ctx, r.clue, 540, 1160, { size: 46, weight: 700, color: P.text, alpha: seg(t, b + 0.8, 0.4) });
+            if (t >= b + 1.4 && t < b + 4.4) {
+              const left = Math.ceil(b + 4.4 - t);
+              ctx.save();
+              ctx.translate(540, 1340);
+              ctx.strokeStyle = P.line;
+              ctx.lineWidth = 12;
+              ctx.beginPath();
+              ctx.arc(0, 0, 70, 0, Math.PI * 2);
+              ctx.stroke();
+              ctx.strokeStyle = P.present;
+              ctx.lineCap = 'round';
+              ctx.beginPath();
+              ctx.arc(0, 0, 70, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * ((b + 4.4 - t) / 3));
+              ctx.stroke();
+              text(ctx, String(left), 0, 2, { size: 76, weight: 900, color: P.text });
+              ctx.restore();
+            }
+            if (t >= b + 4.9) {
+              text(ctx, r.answer.toUpperCase(), 540, 1340, { size: 90, weight: 900, color: P.correct, alpha: seg(t, b + 4.9, 0.3), spacing: 6 });
+            }
+            ctx.restore();
+          });
+          // Progress dots.
+          p.rounds.forEach((_, i) => {
+            const done = t > t0 + i * R + 4.9;
+            ctx.fillStyle = done ? P.correct : P.empty;
+            ctx.beginPath();
+            ctx.arc(540 + (i - 1) * 44, 1500, 12, 0, Math.PI * 2);
+            ctx.fill();
+          });
+        });
+        p.rounds.forEach((_, i) => confetti(ctx, P, t, t0 + i * R + 5.0, 540, 990, 60, 30 + i));
+        fade(ctx, seg(t, tEnd, 0.4), () => {
+          headline(ctx, 'How many did you get?', 540, 520, t, tEnd, { size: 100, lines: 2, color: P.text });
+          ['0', '1', '2', '3'].forEach((n, j) => {
+            const k = seg(t, tEnd + 0.8 + j * 0.15, 0.4);
+            tile(ctx, P, 540 + (j - 1.5) * 150, 820, 128, n, ['absent', 'present', 'present', 'correct'][j], { flip: k, alpha: clamp(k * 4) });
+          });
+          text(ctx, 'Comment your score below', 540, 990, { size: 46, weight: 800, color: P.text, alpha: seg(t, tEnd + 1.6, 0.4) });
+          arrowDown(ctx, P.primary, 540, 1060, t);
+          text(ctx, 'Then share this with a friend', 540, 1140, { size: 38, weight: 600, color: P.sub, alpha: seg(t, tEnd + 1.9, 0.4) });
+        });
+        cta(ctx, P, t, tEnd + 2.4, 540, 1420, 'Play the daily word', playSub);
+      };
+    }
+
+    return { w: W, h: H, dur: +dur.toFixed(2), events: cue.list, draw };
+  }
+
+  // A 9:16 cover whose key content sits inside the profile grid's crop.
+  function pinCover(p) {
+    const P = PAL.dark;
+    const spec = {
+      welcome: ['HELLO', ['correct', 'present', 'correct', 'absent', 'correct'], 'START HERE', 'Welcome to Daily Wordle', P.button],
+      howto: ['PLAY', ['present', 'correct', 'absent', 'correct'], 'LEARN IN 20s', 'How to play in 20 seconds', P.present],
+      challenge: ['DARE', ['correct', 'correct', 'present', 'correct'], 'PLAY ALONG', 'Take the 3-word challenge', P.correct],
+    }[p.type];
+    return {
+      w: 1080, h: 1920, dur: 1, events: [],
+      draw: (ctx, t) => {
+        background(ctx, P, 4 + p.pin * 3, 1080, 1920, 200 + p.pin);
+        const g = ctx.createRadialGradient(540, 820, 0, 540, 820, 620);
+        g.addColorStop(0, hexA(spec[4], 0.35));
+        g.addColorStop(1, hexA(spec[4], 0));
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, 1080, 1920);
+        logo(ctx, P, 540, 420, 64, 99, 0);
+        pill(ctx, spec[2], 540, 560, { k: 1, bg: spec[4], color: '#FFFFFF', size: 36 });
+        const word = spec[0];
+        const s = word.length === 5 ? 168 : 196;
+        const x0 = 540 - rowWidth(word.length, s, 16) / 2 + s / 2;
+        for (let i = 0; i < word.length; i++) {
+          ctx.save();
+          ctx.shadowColor = 'rgba(0,0,0,0.45)';
+          ctx.shadowBlur = 40;
+          tile(ctx, P, x0 + i * (s + 16), 820, s, word[i], spec[1][i], { scale: 1 });
+          ctx.restore();
+        }
+        headline(ctx, spec[3], 540, 1090, 99, 0, { size: 104, lines: 2, color: P.text, maxW: 900 });
+        text(ctx, `${p.pin} / 3`, 540, 1440, { size: 34, weight: 800, color: P.sub, spacing: 4 });
+      },
+    };
+  }
+
+  root.WordleSocial = { reel, post, postSlides, pin, pinCover, PAL };
 })(typeof window !== 'undefined' ? window : globalThis);

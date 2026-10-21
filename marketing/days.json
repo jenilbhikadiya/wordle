@@ -2264,5 +2264,458 @@
     ]
    }
   }
+ },
+ {
+  "day": 51,
+  "date": "2026-12-09",
+  "dateLabel": "Wed 9 Dec",
+  "length": 4,
+  "clue": "Adds extra emphasis, ___ much",
+  "vowels": 1,
+  "word": "very",
+  "prev": "expose",
+  "reel": {
+   "type": "hint"
+  },
+  "post": {
+   "type": "teaser"
+  }
+ },
+ {
+  "day": 52,
+  "date": "2026-12-10",
+  "dateLabel": "Thu 10 Dec",
+  "length": 6,
+  "clue": "Fall off trees in autumn",
+  "vowels": 3,
+  "word": "leaves",
+  "prev": "very",
+  "reel": {
+   "type": "replay",
+   "guesses": [
+    {
+     "word": "near",
+     "states": [
+      "absent",
+      "correct",
+      "absent",
+      "present"
+     ]
+    },
+    {
+     "word": "here",
+     "states": [
+      "absent",
+      "correct",
+      "correct",
+      "absent"
+     ]
+    },
+    {
+     "word": "term",
+     "states": [
+      "absent",
+      "correct",
+      "correct",
+      "absent"
+     ]
+    },
+    {
+     "word": "very",
+     "states": [
+      "correct",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    }
+   ]
+  },
+  "post": {
+   "type": "guess",
+   "answer": "viper",
+   "guesses": [
+    {
+     "word": "arise",
+     "states": [
+      "absent",
+      "present",
+      "present",
+      "absent",
+      "present"
+     ]
+    },
+    {
+     "word": "their",
+     "states": [
+      "absent",
+      "absent",
+      "present",
+      "present",
+      "correct"
+     ]
+    },
+    {
+     "word": "fiber",
+     "states": [
+      "absent",
+      "correct",
+      "absent",
+      "correct",
+      "correct"
+     ]
+    },
+    {
+     "word": "river",
+     "states": [
+      "absent",
+      "correct",
+      "present",
+      "correct",
+      "correct"
+     ]
+    }
+   ],
+   "clue": "A snake with a bite"
+  }
+ },
+ {
+  "day": 53,
+  "date": "2026-12-11",
+  "dateLabel": "Fri 11 Dec",
+  "length": 6,
+  "clue": "Comes in the post, or the alphabet",
+  "vowels": 2,
+  "word": "letter",
+  "prev": "leaves",
+  "reel": {
+   "type": "pause",
+   "answer": "mango",
+   "clue": "Tropical fruit with a big stone",
+   "guesses": [
+    {
+     "word": "slate",
+     "states": [
+      "absent",
+      "absent",
+      "present",
+      "absent",
+      "absent"
+     ]
+    },
+    {
+     "word": "human",
+     "states": [
+      "absent",
+      "absent",
+      "present",
+      "present",
+      "present"
+     ]
+    },
+    {
+     "word": "among",
+     "states": [
+      "present",
+      "present",
+      "present",
+      "present",
+      "present"
+     ]
+    },
+    {
+     "word": "mango",
+     "states": [
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    }
+   ]
+  },
+  "post": {
+   "type": "recap",
+   "clue": "Fall off trees in autumn"
+  }
+ },
+ {
+  "day": 54,
+  "date": "2026-12-12",
+  "dateLabel": "Sat 12 Dec",
+  "length": 6,
+  "clue": "What a goalkeeper does",
+  "vowels": 2,
+  "word": "defend",
+  "prev": "letter",
+  "reel": {
+   "type": "tip",
+   "tip": {
+    "title": "Mind the Y",
+    "body": "Out of vowels? Y often steps in, as in LYRIC or GYPSY.",
+    "demo": [
+     "lyric:acaaa",
+     "shyly:aacaa"
+    ]
+   }
+  },
+  "post": {
+   "type": "fill",
+   "answer": "llama",
+   "pattern": "_la__",
+   "clue": "Fluffy, and might spit at you"
+  }
+ },
+ {
+  "day": 55,
+  "date": "2026-12-13",
+  "dateLabel": "Sun 13 Dec",
+  "length": 4,
+  "clue": "Lost and ___",
+  "vowels": 1,
+  "word": "find",
+  "prev": "defend",
+  "reel": {
+   "type": "feature",
+   "feature": {
+    "title": "Keyboard ready",
+    "body": "Type with a real keyboard on web and desktop.",
+    "icon": "keyboard"
+   }
+  },
+  "post": {
+   "type": "poll",
+   "poll": {
+    "q": "Best feeling in the game?",
+    "opts": [
+     "A 2/6 win",
+     "Saving a 6/6",
+     "A long streak",
+     "Beating a friend"
+    ]
+   }
+  }
+ },
+ {
+  "day": 56,
+  "date": "2026-12-14",
+  "dateLabel": "Mon 14 Dec",
+  "length": 4,
+  "clue": "Hold on tight",
+  "vowels": 1,
+  "word": "grip",
+  "prev": "find",
+  "reel": {
+   "type": "hint"
+  },
+  "post": {
+   "type": "teaser"
+  }
+ },
+ {
+  "day": 57,
+  "date": "2026-12-15",
+  "dateLabel": "Tue 15 Dec",
+  "length": 4,
+  "clue": "A gentleman's counterpart",
+  "vowels": 1,
+  "word": "lady",
+  "prev": "grip",
+  "reel": {
+   "type": "replay",
+   "guesses": [
+    {
+     "word": "near",
+     "states": [
+      "absent",
+      "absent",
+      "absent",
+      "present"
+     ]
+    },
+    {
+     "word": "lord",
+     "states": [
+      "absent",
+      "absent",
+      "present",
+      "absent"
+     ]
+    },
+    {
+     "word": "trip",
+     "states": [
+      "absent",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    },
+    {
+     "word": "grip",
+     "states": [
+      "correct",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    }
+   ]
+  },
+  "post": {
+   "type": "guess",
+   "answer": "ninja",
+   "guesses": [
+    {
+     "word": "stare",
+     "states": [
+      "absent",
+      "absent",
+      "present",
+      "absent",
+      "absent"
+     ]
+    },
+    {
+     "word": "album",
+     "states": [
+      "present",
+      "absent",
+      "absent",
+      "absent",
+      "absent"
+     ]
+    },
+    {
+     "word": "candy",
+     "states": [
+      "absent",
+      "present",
+      "correct",
+      "absent",
+      "absent"
+     ]
+    }
+   ],
+   "clue": "Silent, stealthy and in black"
+  }
+ },
+ {
+  "day": 58,
+  "date": "2026-12-16",
+  "dateLabel": "Wed 16 Dec",
+  "length": 6,
+  "clue": "The why behind it all",
+  "vowels": 3,
+  "word": "reason",
+  "prev": "lady",
+  "reel": {
+   "type": "pause",
+   "answer": "lemur",
+   "clue": "Big-eyed climber from Madagascar",
+   "guesses": [
+    {
+     "word": "crane",
+     "states": [
+      "absent",
+      "present",
+      "absent",
+      "absent",
+      "present"
+     ]
+    },
+    {
+     "word": "offer",
+     "states": [
+      "absent",
+      "absent",
+      "absent",
+      "present",
+      "correct"
+     ]
+    },
+    {
+     "word": "their",
+     "states": [
+      "absent",
+      "absent",
+      "present",
+      "absent",
+      "correct"
+     ]
+    },
+    {
+     "word": "lemur",
+     "states": [
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct"
+     ]
+    }
+   ]
+  },
+  "post": {
+   "type": "recap",
+   "clue": "A gentleman's counterpart"
+  }
+ },
+ {
+  "day": 59,
+  "date": "2026-12-17",
+  "dateLabel": "Thu 17 Dec",
+  "length": 5,
+  "clue": "Piano, canyon or a thousand dollars",
+  "vowels": 1,
+  "word": "grand",
+  "prev": "reason",
+  "reel": {
+   "type": "tip",
+   "tip": {
+    "title": "Missed one? Catch up",
+    "body": "Past days wait in the calendar. Play them any time.",
+    "demo": [
+     "catch:ccccc"
+    ]
+   }
+  },
+  "post": {
+   "type": "fill",
+   "answer": "sushi",
+   "pattern": "_us__",
+   "clue": "Rice and fish, rolled up"
+  }
+ },
+ {
+  "day": 60,
+  "date": "2026-12-18",
+  "dateLabel": "Fri 18 Dec",
+  "length": 4,
+  "clue": "Like a pillow or a whisper",
+  "vowels": 1,
+  "word": "soft",
+  "prev": "grand",
+  "reel": {
+   "type": "feature",
+   "feature": {
+    "title": "Day streak",
+    "body": "Play each daily puzzle on its day and watch the flame grow.",
+    "icon": "flame"
+   }
+  },
+  "post": {
+   "type": "poll",
+   "poll": {
+    "q": "60 days in! How's your streak?",
+    "opts": [
+     "Still going",
+     "Broke it once",
+     "Starting over",
+     "Just found you"
+    ]
+   }
+  }
  }
 ]
