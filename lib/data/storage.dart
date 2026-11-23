@@ -23,10 +23,14 @@ class Storage {
     return updated;
   }
 
-  // Stats per word length
+  // Stats per word length, plus one set for the Extreme levels
 
-  Future<GameStats> stats(int length) async {
-    final raw = (await _prefs).getString('stats_$length');
+  Future<GameStats> stats(int length) => _stats('stats_$length');
+
+  Future<GameStats> extremeStats() => _stats('stats_extreme');
+
+  Future<GameStats> _stats(String key) async {
+    final raw = (await _prefs).getString(key);
     if (raw == null) return GameStats();
     try {
       return GameStats.fromJson(json.decode(raw));
@@ -39,14 +43,51 @@ class Storage {
     int length, {
     required bool won,
     required int attempts,
+  }) => _record('stats_$length', won: won, attempts: attempts);
+
+  /// Extreme games keep their own stats so they don't drag down the rest.
+  Future<GameStats> recordExtremeGame({
+    required bool won,
+    required int attempts,
+  }) => _record('stats_extreme', won: won, attempts: attempts);
+
+  Future<GameStats> _record(
+    String key, {
+    required bool won,
+    required int attempts,
   }) async {
-    final stats = await this.stats(length);
+    final stats = await _stats(key);
     stats.record(won: won, attempts: attempts);
-    await (await _prefs).setString(
-      'stats_$length',
-      json.encode(stats.toJson()),
-    );
+    await (await _prefs).setString(key, json.encode(stats.toJson()));
     return stats;
+  }
+
+  // Extreme levels
+
+  /// The highest level cleared in a row from level 1; 0 when none.
+  Future<int> extremeCleared() async =>
+      (await _prefs).getInt('extreme_cleared') ?? 0;
+
+  /// Fewest guesses each cleared level took, keyed by level number.
+  Future<Map<int, int>> extremeBest() async {
+    final prefs = await _prefs;
+    return {
+      for (final key in prefs.getKeys())
+        if (key.startsWith('extreme_best_'))
+          int.parse(key.substring(13)): prefs.getInt(key)!,
+    };
+  }
+
+  /// Records a cleared level and unlocks the next. Returns true the first
+  /// time the level is cleared.
+  Future<bool> saveExtremeWin(int level, int guesses) async {
+    final prefs = await _prefs;
+    final bestKey = 'extreme_best_$level';
+    final best = prefs.getInt(bestKey);
+    if (best == null || guesses < best) await prefs.setInt(bestKey, guesses);
+    final cleared = prefs.getInt('extreme_cleared') ?? 0;
+    if (level > cleared) await prefs.setInt('extreme_cleared', level);
+    return best == null;
   }
 
   // Daily puzzles, keyed by calendar date (see dateKey)

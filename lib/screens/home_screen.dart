@@ -5,11 +5,14 @@ import 'package:flutter/material.dart';
 import '../app_settings.dart';
 import '../data/storage.dart';
 import '../data/word_repository.dart';
+import '../game/extreme_levels.dart';
 import '../game/game_logic.dart';
 import '../theme/app_theme.dart';
+import '../theme/premium_route.dart';
 import '../widgets/info_sheets.dart';
 import '../widgets/stats_view.dart';
 import 'calendar_screen.dart';
+import 'extreme_screen.dart';
 import 'game_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -27,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _todayStarted = false;
   Map<String, int> _weekResults = {};
   Set<String> _playedDays = {};
+  int _extremeCleared = 0;
   late DateTime _today;
 
   @override
@@ -58,6 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final result = await storage.dailyResult(key);
     final started = (await storage.dailyGuesses(key)).isNotEmpty;
     final week = await storage.dailyResults(_week.map(dateKey));
+    final extreme = await storage.extremeCleared();
     if (!mounted) return;
     setState(() {
       _points = points;
@@ -67,6 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _todayResult = result;
       _todayStarted = started;
       _weekResults = week;
+      _extremeCleared = extreme;
     });
   }
 
@@ -198,6 +204,17 @@ class _HomeScreenState extends State<HomeScreen> {
                           enabled: AppSettings.instance.hardMode,
                           onChanged: AppSettings.instance.setHardMode,
                         ),
+                      ),
+                      const SizedBox(height: 28),
+                      _ExtremeCard(
+                        cleared: _extremeCleared,
+                        onTap: () async {
+                          await Navigator.push(
+                            context,
+                            premiumRoute(const ExtremeScreen()),
+                          );
+                          _load();
+                        },
                       ),
                       const SizedBox(height: 24),
                     ],
@@ -724,6 +741,156 @@ class _HardModeRow extends StatelessWidget {
         ),
         value: enabled,
         onChanged: onChanged,
+      ),
+    );
+  }
+}
+
+/// The way into the Extreme levels, drawn in the premium theme whatever the
+/// app theme is.
+class _ExtremeCard extends StatelessWidget {
+  final int cleared;
+  final VoidCallback onTap;
+
+  const _ExtremeCard({required this.cleared, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final total = extremeLevels.length;
+    final done = cleared >= total;
+    const ivory = Color(0xFFF4EEDF);
+    const muted = Color(0xFFA9A18F);
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: AppTheme.goldGradient,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.gold.withValues(alpha: 0.25),
+            blurRadius: 18,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(1.5),
+      child: Material(
+        color: AppTheme.obsidian,
+        borderRadius: BorderRadius.circular(16.5),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Ink(
+            decoration: const BoxDecoration(
+              gradient: RadialGradient(
+                center: Alignment(1, -1),
+                radius: 1.4,
+                colors: [Color(0xFF2A2214), AppTheme.obsidian],
+              ),
+            ),
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const ExtremeBadge(),
+                    const Spacer(),
+                    Text(
+                      '$cleared/$total',
+                      style: const TextStyle(
+                        color: AppTheme.gold,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                const GoldText('50 EXTREME LEVELS', size: 20),
+                const SizedBox(height: 6),
+                const Text(
+                  'Rare words, look-alike traps, fewer guesses and a blind '
+                  'keyboard. Hard mode is always on.',
+                  style: TextStyle(color: muted, height: 1.35),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    for (final tier in ExtremeTier.values)
+                      Expanded(
+                        child: Container(
+                          height: 6,
+                          margin: const EdgeInsets.only(right: 4),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(3),
+                            gradient: cleared >= tier.lastLevel
+                                ? AppTheme.goldGradient
+                                : null,
+                            color: cleared >= tier.lastLevel
+                                ? null
+                                : const Color(0xFF2A2830),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Text(
+                      done
+                          ? 'All levels cleared'
+                          : cleared == 0
+                          ? 'Start at level 1'
+                          : 'Continue at level ${cleared + 1}',
+                      style: const TextStyle(
+                        color: ivory,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const Spacer(),
+                    const Icon(
+                      Icons.arrow_forward_rounded,
+                      color: AppTheme.gold,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Small gold "EXTREME" label.
+class ExtremeBadge extends StatelessWidget {
+  const ExtremeBadge({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        gradient: AppTheme.goldGradient,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.diamond_rounded, size: 14, color: Color(0xFF1C1505)),
+          SizedBox(width: 4),
+          Text(
+            'PREMIUM',
+            style: TextStyle(
+              color: Color(0xFF1C1505),
+              fontSize: 11,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.2,
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../game/extreme_levels.dart';
 import '../game/game_controller.dart';
 import '../theme/app_theme.dart';
+import '../theme/premium_route.dart';
 import '../widgets/board.dart';
 import '../widgets/info_sheets.dart';
 import '../widgets/keyboard.dart';
@@ -13,12 +15,16 @@ import '../widgets/result_sheet.dart';
 class GameScreen extends StatefulWidget {
   /// The calendar day of a daily puzzle, or null for practice.
   final DateTime? dailyDate;
+
+  /// The Extreme level to play, or null. Open it with [premiumRoute].
+  final ExtremeLevel? level;
   final int wordLength;
   final bool hardMode;
 
   const GameScreen({
     super.key,
     this.dailyDate,
+    this.level,
     this.wordLength = 5,
     this.hardMode = false,
   });
@@ -31,6 +37,7 @@ class _GameScreenState extends State<GameScreen>
     with SingleTickerProviderStateMixin {
   late final GameController _game = GameController(
     dailyDate: widget.dailyDate,
+    level: widget.level,
     unlimitedLength: widget.wordLength,
     hardMode: widget.hardMode,
   );
@@ -80,7 +87,8 @@ class _GameScreenState extends State<GameScreen>
     if (!result.restored) {
       await Future.delayed(const Duration(milliseconds: 900));
     }
-    if (!result.won && !result.restored) {
+    // An Extreme level keeps its word secret so it can be tried again
+    if (!result.won && !result.restored && !_game.isExtreme) {
       _showToast(_game.target.toUpperCase());
     }
     if (!mounted) return;
@@ -94,6 +102,11 @@ class _GameScreenState extends State<GameScreen>
     if (!mounted) return;
     if (action == ResultAction.playAgain) {
       _game.start();
+    } else if (action == ResultAction.nextLevel) {
+      Navigator.pushReplacement(
+        context,
+        premiumRoute(GameScreen(level: extremeLevels[_game.level!.number])),
+      );
     } else if (action == ResultAction.close) {
       Navigator.pop(context);
     }
@@ -125,20 +138,36 @@ class _GameScreenState extends State<GameScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final level = widget.level;
 
     return ListenableBuilder(
       listenable: _game,
       builder: (context, _) {
         final loading = _game.status == GameStatus.loading;
-        return Scaffold(
+        final scaffold = Scaffold(
+          backgroundColor: level != null ? Colors.transparent : null,
           appBar: AppBar(
+            backgroundColor: level != null ? Colors.transparent : null,
             title: Column(
               children: [
-                Text(_game.isDaily ? 'Daily #${_game.dailyNo}' : 'Practice'),
+                Text(
+                  level != null
+                      ? 'Level ${level.number}'
+                      : _game.isDaily
+                      ? 'Daily #${_game.dailyNo}'
+                      : 'Practice',
+                  style: level != null
+                      ? TextStyle(color: theme.colorScheme.primary)
+                      : null,
+                ),
                 if (!loading)
                   Text(
-                    '${_game.wordLength} letters'
-                    '${_game.hardMode ? ' · Hard mode' : ''}',
+                    level != null
+                        ? '${level.tier.name} · ${_game.wordLength} letters · '
+                              '${level.maxAttempts} guesses'
+                              '${level.blindKeyboard ? ' · Blind' : ''}'
+                        : '${_game.wordLength} letters'
+                              '${_game.hardMode ? ' · Hard mode' : ''}',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                       letterSpacing: 0,
@@ -147,7 +176,7 @@ class _GameScreenState extends State<GameScreen>
               ],
             ),
             actions: [
-              if (!loading && !_game.isOver)
+              if (!loading && !_game.isOver && _game.hintLimit > 0)
                 _HintButton(
                   hintsLeft: _game.hintsLeft,
                   onPressed: _game.useHint,
@@ -190,7 +219,9 @@ class _GameScreenState extends State<GameScreen>
                             Padding(
                               padding: const EdgeInsets.fromLTRB(6, 0, 6, 10),
                               child: GameKeyboard(
-                                keyStates: _game.keyStates,
+                                keyStates: _game.showKeyColors
+                                    ? _game.keyStates
+                                    : const {},
                                 onLetter: _game.type,
                                 onEnter: _game.submit,
                                 onBackspace: _game.backspace,
@@ -204,6 +235,7 @@ class _GameScreenState extends State<GameScreen>
             ),
           ),
         );
+        return level != null ? PremiumBackdrop(child: scaffold) : scaffold;
       },
     );
   }

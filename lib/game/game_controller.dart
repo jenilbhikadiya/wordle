@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import '../data/storage.dart';
 import '../data/word_repository.dart';
 import '../models/game_stats.dart';
+import 'extreme_levels.dart';
 import 'game_logic.dart';
 
 enum GameStatus { loading, playing, won, lost }
@@ -17,6 +18,8 @@ class GameResult {
   final int dayStreak;
   // True when reopening a daily that was already finished.
   final bool restored;
+  // True the first time an Extreme level is cleared.
+  final bool levelCleared;
 
   const GameResult({
     required this.won,
@@ -24,12 +27,13 @@ class GameResult {
     required this.pointsEarned,
     required this.dayStreak,
     this.restored = false,
+    this.levelCleared = false,
   });
 }
 
 /// Holds one game's state and rules. The screen renders it and forwards input.
 class GameController extends ChangeNotifier {
-  static const maxAttempts = 6;
+  static const defaultMaxAttempts = 6;
   static const maxHints = 2;
   static const hintCost = 2;
   static const hardModeBonus = 3;
@@ -39,7 +43,12 @@ class GameController extends ChangeNotifier {
 
   /// The calendar day of a daily puzzle, or null for unlimited play.
   final DateTime? dailyDate;
+
+  /// The Extreme level being played, or null.
+  final ExtremeLevel? level;
   final int unlimitedLength;
+
+  /// Extreme levels are always played in hard mode.
   final bool hardMode;
 
   /// Called with a short message, e.g. "Not in word list".
@@ -53,11 +62,22 @@ class GameController extends ChangeNotifier {
 
   GameController({
     this.dailyDate,
+    this.level,
     this.unlimitedLength = 5,
-    this.hardMode = false,
-  });
+    bool hardMode = false,
+  }) : hardMode = hardMode || level != null;
 
   bool get isDaily => dailyDate != null;
+  bool get isExtreme => level != null;
+
+  /// Rows on the board: six, or fewer on an Extreme level.
+  int get maxAttempts => level?.maxAttempts ?? defaultMaxAttempts;
+
+  /// Letter reveals allowed this game.
+  int get hintLimit => level?.hints ?? maxHints;
+
+  /// Whether the keyboard should show letter colours.
+  bool get showKeyColors => !(level?.blindKeyboard ?? false);
   int? get dailyNo => isDaily ? dailyNumber(dailyDate!) : null;
 
   GameStatus status = GameStatus.loading;
@@ -74,7 +94,7 @@ class GameController extends ChangeNotifier {
 
   String get _dayKey => dateKey(dailyDate!);
   bool get isOver => status == GameStatus.won || status == GameStatus.lost;
-  int get hintsLeft => maxHints - hints.length;
+  int get hintsLeft => hintLimit - hints.length;
   bool get canHint => status == GameStatus.playing && hintsLeft > 0;
 
   Duration get rowRevealTime => revealStep * (wordLength - 1) + flipDuration;
@@ -89,7 +109,10 @@ class GameController extends ChangeNotifier {
     notifyListeners();
 
     final words = WordRepository.instance;
-    if (isDaily) {
+    if (isExtreme) {
+      target = level!.word;
+      wordLength = target.length;
+    } else if (isDaily) {
       target = dailyWord(await words.dailySchedule(), dailyDate!);
       wordLength = target.length;
     } else {
@@ -181,13 +204,20 @@ class GameController extends ChangeNotifier {
   Future<void> _finish(bool won) async {
     status = won ? GameStatus.won : GameStatus.lost;
     final storage = Storage.instance;
-    final points = won ? _pointsForWin() : 0;
+    var firstClear = false;
+    if (isExtreme && won) {
+      firstClear = await storage.saveExtremeWin(level!.number, guesses.length);
+    }
+    // Replaying a cleared Extreme level earns no points
+    final points = won && (!isExtreme || firstClear) ? _pointsForWin() : 0;
     if (points > 0) await storage.addPoints(points);
-    final stats = await storage.recordGame(
-      wordLength,
-      won: won,
-      attempts: guesses.length,
-    );
+    final stats = isExtreme
+        ? await storage.recordExtremeGame(won: won, attempts: guesses.length)
+        : await storage.recordGame(
+            wordLength,
+            won: won,
+            attempts: guesses.length,
+          );
     if (isDaily) {
       await storage.saveDailyResult(_dayKey, won ? guesses.length : 0);
     }
@@ -196,12 +226,19 @@ class GameController extends ChangeNotifier {
       stats: stats,
       pointsEarned: points,
       dayStreak: dayStreak(await storage.playedDays(), DateTime.now()),
+      levelCleared: firstClear,
     );
     notifyListeners();
     onFinished?.call(result!);
   }
 
   int _pointsForWin() {
+    if (isExtreme) {
+      return math.max(
+        1,
+        level!.pointsFor(guesses.length) - hints.length * hintCost,
+      );
+    }
     const base = {4: 5, 5: 6, 6: 7};
     final bonus = hardMode ? hardModeBonus : 0;
     // Fewer guesses earn more
@@ -262,5 +299,6 @@ class GameController extends ChangeNotifier {
     hardMode: hardMode,
     hintsUsed: hints.length,
     dailyDate: dailyDate,
+    title: isExtreme ? 'Wordle Future · Extreme ${level!.number}' : null,
   );
 }

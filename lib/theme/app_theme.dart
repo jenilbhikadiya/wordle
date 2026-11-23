@@ -14,6 +14,9 @@ class GameColors extends ThemeExtension<GameColors> {
   final Color streak;
   final Color hint;
 
+  /// Tiles get a metallic sheen and a soft glow, used by the Extreme theme.
+  final bool luxe;
+
   const GameColors({
     required this.correct,
     required this.present,
@@ -25,6 +28,7 @@ class GameColors extends ThemeExtension<GameColors> {
     required this.onKey,
     required this.streak,
     required this.hint,
+    this.luxe = false,
   });
 
   static const light = GameColors(
@@ -53,6 +57,21 @@ class GameColors extends ThemeExtension<GameColors> {
     hint: Color(0xFFE5B530),
   );
 
+  /// Obsidian and gold, for the Extreme levels.
+  static const premium = GameColors(
+    correct: Color(0xFFC9A13B),
+    present: Color(0xFF8B5CF6),
+    absent: Color(0xFF26252C),
+    onTile: Colors.white,
+    emptyBorder: Color(0xFF2F2B24),
+    filledBorder: Color(0xFF8C7A4E),
+    key: Color(0xFF1F1E25),
+    onKey: Color(0xFFF4EEDF),
+    streak: Color(0xFFE6C46A),
+    hint: Color(0xFFE6C46A),
+    luxe: true,
+  );
+
   static GameColors of(BuildContext context) =>
       Theme.of(context).extension<GameColors>()!;
 
@@ -74,6 +93,7 @@ class GameColors extends ThemeExtension<GameColors> {
       onKey: l(onKey, other.onKey),
       streak: l(streak, other.streak),
       hint: l(hint, other.hint),
+      luxe: t < 0.5 ? luxe : other.luxe,
     );
   }
 }
@@ -112,6 +132,35 @@ class AppTheme {
       outlineVariant: const Color(0xFF2E3138),
     ),
     GameColors.dark,
+  );
+
+  /// Gold on obsidian, used for the Extreme levels whatever the app theme.
+  static const gold = Color(0xFFE6C46A);
+  static const goldDeep = Color(0xFFB08A2E);
+  static const obsidian = Color(0xFF0B0B0E);
+  static const amethyst = Color(0xFF8B5CF6);
+
+  /// Gold gradient for premium accents.
+  static const goldGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFFF6E3A1), gold, goldDeep],
+  );
+
+  static ThemeData premium() => _build(
+    ColorScheme.fromSeed(seedColor: gold, brightness: Brightness.dark).copyWith(
+      primary: gold,
+      onPrimary: const Color(0xFF1C1505),
+      secondary: amethyst,
+      surface: obsidian,
+      surfaceContainerLow: const Color(0xFF15141A),
+      surfaceContainer: const Color(0xFF1E1D24),
+      onSurface: const Color(0xFFF4EEDF),
+      onSurfaceVariant: const Color(0xFFA9A18F),
+      outlineVariant: const Color(0xFF3A3326),
+      error: const Color(0xFFFF6B6B),
+    ),
+    GameColors.premium,
   );
 
   static ThemeData _build(ColorScheme scheme, GameColors game) {

@@ -16,11 +16,12 @@ class Board extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final length = game.wordLength;
+    final rows = game.maxAttempts;
     return LayoutBuilder(
       builder: (context, constraints) {
         const gap = 6.0;
         final byWidth = (constraints.maxWidth - gap * (length - 1)) / length;
-        final byHeight = (constraints.maxHeight - gap * 5) / 6;
+        final byHeight = (constraints.maxHeight - gap * (rows - 1)) / rows;
         final size = math
             .min(66.0, math.min(byWidth, byHeight))
             .floorToDouble();
@@ -29,9 +30,9 @@ class Board extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              for (int r = 0; r < GameController.maxAttempts; r++)
+              for (int r = 0; r < rows; r++)
                 Padding(
-                  padding: EdgeInsets.only(bottom: r == 5 ? 0 : gap),
+                  padding: EdgeInsets.only(bottom: r == rows - 1 ? 0 : gap),
                   child: _buildRow(r, size, gap),
                 ),
             ],
@@ -216,6 +217,20 @@ class _TileState extends State<Tile> with TickerProviderStateMixin {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: fill,
+                  gradient: colors.luxe && fill != Colors.transparent
+                      ? _sheen(fill)
+                      : null,
+                  boxShadow:
+                      colors.luxe &&
+                          flipped &&
+                          widget.state == LetterState.correct
+                      ? [
+                          BoxShadow(
+                            color: fill.withValues(alpha: 0.45),
+                            blurRadius: 14,
+                          ),
+                        ]
+                      : null,
                   borderRadius: BorderRadius.circular(widget.size * 0.12),
                   border: Border.all(
                     color: showHint
@@ -242,3 +257,15 @@ class _TileState extends State<Tile> with TickerProviderStateMixin {
     );
   }
 }
+
+/// A metallic highlight across a filled tile, for the premium theme.
+LinearGradient _sheen(Color base) => LinearGradient(
+  begin: Alignment.topLeft,
+  end: Alignment.bottomRight,
+  colors: [
+    Color.lerp(base, Colors.white, 0.28)!,
+    base,
+    Color.lerp(base, Colors.black, 0.25)!,
+  ],
+  stops: const [0, 0.55, 1],
+);
