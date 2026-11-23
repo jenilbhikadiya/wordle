@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 
+import '../game/extreme_levels.dart';
+
 /// Loads the bundled word lists once and keeps them in memory.
 class WordRepository {
   WordRepository._();
@@ -36,7 +38,12 @@ class WordRepository {
       'assets/all_english_words/${_names[length]}_name_word.json',
     );
     final daily = (await dailySchedule()).where((w) => w.length == length);
-    return _dictionaries[length] = {...all, ...await answers(length), ...daily};
+    return _dictionaries[length] = {
+      ...all,
+      ...await answers(length),
+      ...daily,
+      ...extremeWords(length),
+    };
   }
 
   /// The daily schedule in day order, so index 0 is day 1. Each entry in the

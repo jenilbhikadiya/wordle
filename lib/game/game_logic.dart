@@ -150,8 +150,9 @@ String shareText({
   required bool hardMode,
   int hintsUsed = 0,
   DateTime? dailyDate,
+  String? title,
 }) {
-  final title = dailyDate != null
+  title ??= dailyDate != null
       ? 'Wordle Future #${dailyNumber(dailyDate)}'
       : 'Wordle Future';
   final score =

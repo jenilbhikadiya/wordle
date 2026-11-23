@@ -3,11 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../game/extreme_levels.dart';
 import '../game/game_controller.dart';
 import '../theme/app_theme.dart';
 import 'stats_view.dart';
 
-enum ResultAction { playAgain, close }
+enum ResultAction { playAgain, nextLevel, close }
 
 /// End-of-game summary: the answer, points, streak, stats and sharing.
 Future<ResultAction?> showResultSheet(
@@ -59,16 +60,22 @@ class _ResultSheet extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               won
-                  ? 'Solved in ${game.guesses.length}/${GameController.maxAttempts}'
+                  ? 'Solved in ${game.guesses.length}/${game.maxAttempts}'
+                  : game.isExtreme
+                  ? 'Out of guesses'
                   : 'The word was',
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyLarge?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
-            if (!won) ...[
+            if (!won && !game.isExtreme) ...[
               const SizedBox(height: 10),
               Center(child: _AnswerTiles(word: game.target)),
+            ],
+            if (game.isExtreme) ...[
+              const SizedBox(height: 14),
+              _LevelSummary(level: game.level!, won: won, result: result),
             ],
             const SizedBox(height: 18),
             Wrap(
@@ -88,7 +95,7 @@ class _ResultSheet extends StatelessWidget {
                     color: colors.streak,
                     label: '${result.dayStreak} day streak',
                   ),
-                if (game.hardMode)
+                if (game.hardMode && !game.isExtreme)
                   _Pill(
                     icon: Icons.bolt_rounded,
                     color: colors.present,
@@ -127,26 +134,122 @@ class _ResultSheet extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-                Expanded(
-                  child: FilledButton.icon(
-                    onPressed: () => Navigator.pop(
-                      context,
-                      game.isDaily
-                          ? ResultAction.close
-                          : ResultAction.playAgain,
-                    ),
-                    icon: Icon(
-                      game.isDaily
-                          ? Icons.check_rounded
-                          : Icons.refresh_rounded,
-                    ),
-                    label: Text(game.isDaily ? 'Done' : 'Play again'),
-                  ),
-                ),
+                Expanded(child: _primaryButton(context, won)),
               ],
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+extension on _ResultSheet {
+  Widget _primaryButton(BuildContext context, bool won) {
+    final ResultAction action;
+    final IconData icon;
+    final String label;
+    if (game.isExtreme) {
+      final hasNext = game.level!.number < extremeLevels.length;
+      if (!won) {
+        (action, icon, label) = (
+          ResultAction.playAgain,
+          Icons.refresh_rounded,
+          'Try again',
+        );
+      } else if (hasNext) {
+        (action, icon, label) = (
+          ResultAction.nextLevel,
+          Icons.arrow_forward_rounded,
+          'Next level',
+        );
+      } else {
+        (action, icon, label) = (
+          ResultAction.close,
+          Icons.workspace_premium_rounded,
+          'Done',
+        );
+      }
+    } else if (game.isDaily) {
+      (action, icon, label) = (ResultAction.close, Icons.check_rounded, 'Done');
+    } else {
+      (action, icon, label) = (
+        ResultAction.playAgain,
+        Icons.refresh_rounded,
+        'Play again',
+      );
+    }
+    return FilledButton.icon(
+      onPressed: () => Navigator.pop(context, action),
+      icon: Icon(icon),
+      label: Text(label),
+    );
+  }
+}
+
+/// What an Extreme level was about. A lost level keeps its word secret so
+/// the player can try again.
+class _LevelSummary extends StatelessWidget {
+  final ExtremeLevel level;
+  final bool won;
+  final GameResult result;
+
+  const _LevelSummary({
+    required this.level,
+    required this.won,
+    required this.result,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final last = level.number == extremeLevels.length;
+    final String headline;
+    if (!won) {
+      headline = 'The word stays hidden. Try again.';
+    } else if (last && result.levelCleared) {
+      headline = 'All 50 Extreme levels cleared. Legendary.';
+    } else if (result.levelCleared && !last) {
+      headline = 'Level ${level.number + 1} unlocked';
+    } else {
+      headline = 'Level ${level.number} cleared again';
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: scheme.primary.withValues(alpha: 0.35)),
+      ),
+      child: Column(
+        children: [
+          Text(
+            '${level.tier.name.toUpperCase()} · LEVEL ${level.number}',
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: scheme.primary,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.6,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            headline,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.titleMedium,
+          ),
+          if (won) ...[
+            const SizedBox(height: 4),
+            Text(
+              level.twist,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: scheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
